@@ -45,4 +45,5 @@ dist-ssr
 .vagrant
 .cache
 
-.env.yml
+secrets.yml
+.vault_pass.txt

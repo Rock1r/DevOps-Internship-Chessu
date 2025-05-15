@@ -26,8 +26,8 @@ Vagrant.configure("2") do |config|
     server.vm.box = "ubuntu/jammy64"
     server.vm.network "private_network", ip: "192.168.50.3"
     server.vm.provider "virtualbox" do |vb|
-      vb.memory = "4096"
-      vb.cpus = 4
+      vb.memory = "2048"
+      vb.cpus = 2
     end
 
     server.vm.network "forwarded_port", guest: 3001, host: 3001
@@ -39,8 +39,8 @@ Vagrant.configure("2") do |config|
     ansible.vm.network "private_network", ip: "192.168.50.1"
     ansible.vm.synced_folder ".", "/vagrant"
     ansible.vm.provider "virtualbox" do |vb|
-      vb.memory = "4096"
-      vb.cpus = 4
+      vb.memory = "2048"
+      vb.cpus = 2
     end
     ansible.vm.provision "shell", inline: <<-SHELL
       apt-get update
@@ -50,8 +50,14 @@ Vagrant.configure("2") do |config|
 
       ansible-galaxy collection install community.postgresql:3.14.0
       ansible-galaxy collection install community.general
-
-      ansible-playbook -i /vagrant/ansible/hosts.ini /vagrant/ansible/master.yml
+      cp /vagrant/ansible/.vault_pass.txt /tmp/.vault_pass.txt
+      chmod 600 /tmp/.vault_pass.txt
+      if ! grep -q '^$ANSIBLE_VAULT;' /vagrant/ansible/secrets.yml; then
+        ansible-vault encrypt /vagrant/ansible/secrets.yml --vault-password-file /tmp/.vault_pass.txt
+      fi
+      ansible-playbook -i /vagrant/ansible/hosts.ini /vagrant/ansible/master.yml -e "@/vagrant/ansible/secrets.yml" --vault-password-file /tmp/.vault_pass.txt
+      ansible-vault decrypt /vagrant/ansible/secrets.yml --vault-password-file /tmp/.vault_pass.txt
+      rm -f /tmp/.vault_pass.txt
     SHELL
   end
 end

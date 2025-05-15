@@ -4,7 +4,7 @@
     contype: host
     users: all
     databases: all
-    address: "{{ SUBNET_ADDRESS }}/24"
+    address: "{{ SUBNET_ADDRESS }}"
     method: md5
 
 - name: Ensure PostgreSQL is listening on all interfaces
@@ -13,3 +13,4 @@
     value: '*'
     port: 5432
   become_user: postgres
+  notify: Restart PostgreSQL
