@@ -1,0 +1,18 @@
+server {
+    listen 80;
+    server_name 192.168.50.2;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Cookie $http_cookie;
+    }
+
+    location /v1/ {
+        proxy_pass http://192.168.50.3:3001/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Cookie $http_cookie;
+    }
+}
