@@ -2,15 +2,13 @@ Vagrant.configure("2") do |config|
   config.vm.define "db" do |db|
     db.vm.box = "ubuntu/jammy64"
     db.vm.network "private_network", ip: "192.168.50.4"
-    db.vm.synced_folder ".", "/vagrant"
 
     db.vm.provider "virtualbox" do |vb|
       vb.memory = "2048"
       vb.cpus = 2
     end
-    db.vm.provision "ansible_local" do |ansible|
-      ansible.playbook = "ansible/db_playbook.yml"
-    end
+
+    db.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
   config.vm.define "client" do |client|
@@ -21,15 +19,7 @@ Vagrant.configure("2") do |config|
       vb.cpus = 2
     end
     client.vm.network "forwarded_port", guest: 3000, host: 3000
-
-    client.vm.synced_folder ".", "/vagrant"
-
-    client.vm.provision "ansible_local" do |ansible|
-      ansible.playbook = "ansible/app_playbook.yml"
-      ansible.extra_vars = {
-        name: "client",
-      }
-    end
+    client.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
   config.vm.define "server" do |server|
@@ -41,14 +31,27 @@ Vagrant.configure("2") do |config|
     end
 
     server.vm.network "forwarded_port", guest: 3001, host: 3001
+    server.vm.synced_folder ".", "/vagrant", disabled: true
+  end
 
-    server.vm.synced_folder ".", "/vagrant"
-
-    server.vm.provision "ansible_local" do |ansible|
-      ansible.playbook = "ansible/app_playbook.yml"
-      ansible.extra_vars = {
-        name: "server",
-      }
+  config.vm.define "ansible" do |ansible|
+    ansible.vm.box = "ubuntu/jammy64"
+    ansible.vm.network "private_network", ip: "192.168.50.1"
+    ansible.vm.synced_folder ".", "/vagrant"
+    ansible.vm.provider "virtualbox" do |vb|
+      vb.memory = "4096"
+      vb.cpus = 4
     end
+    ansible.vm.provision "shell", inline: <<-SHELL
+      apt-get update
+      apt-get install -y python3-pip
+
+      pip3 install ansible
+
+      ansible-galaxy collection install community.postgresql:3.14.0
+      ansible-galaxy collection install community.general
+
+      ansible-playbook -i /vagrant/ansible/hosts.ini /vagrant/ansible/master.yml
+    SHELL
   end
 end

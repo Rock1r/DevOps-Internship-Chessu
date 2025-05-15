@@ -1,0 +1,13 @@
+- name: Create .env file
+  ansible.builtin.template:
+    src: .env.j2
+    dest: /home/{{USERNAME}}/chessu/server/.env
+    owner: "{{ USERNAME }}"
+    group: "{{ USERNAME }}"
+    mode: '0644'
+  become: true
+
+- name: Start application
+  ansible.builtin.command: pm2 start --name client "pnpm dev:client"
+  args:
+    chdir: "/home/{{ USERNAME }}/chessu/"

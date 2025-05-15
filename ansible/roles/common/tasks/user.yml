@@ -1,0 +1,8 @@
+- name: Create common application user
+  ansible.builtin.user:
+    name: "{{ USERNAME }}"
+    password: "{{ PASSWORD }}"
+    shell: /bin/bash
+    groups: sudo
+    append: yes
+    create_home: yes
