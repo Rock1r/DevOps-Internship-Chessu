@@ -1,0 +1,15 @@
+[Unit]
+Description=Next.js client app
+After=network.target
+
+[Service]
+User={{ USERNAME }}
+WorkingDirectory=/home/{{ USERNAME }}/chessu
+ExecStart=/usr/bin/pnpm --filter client start
+Restart=always
+Environment=NODE_ENV=production
+StandardOutput=append:/var/log/chessu-client.log
+StandardError=append:/var/log/chessu-client-error.log
+
+[Install]
+WantedBy=multi-user.target

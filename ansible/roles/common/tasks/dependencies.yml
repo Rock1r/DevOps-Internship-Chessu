@@ -19,15 +19,3 @@
     name: pnpm
     global: true
     state: present
-
-- name: Install pm2
-  ansible.builtin.npm:
-    name: pm2
-    global: true
-    state: present
-
-- name: Install dependencies
-  community.general.pnpm:
-    path: "/home/{{ USERNAME }}/chessu/"
-    production: false
-  become_user: root

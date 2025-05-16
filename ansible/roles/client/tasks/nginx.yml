@@ -4,7 +4,7 @@
     state: present
     update_cache: true
 
-- name: Upload NGINX config for dev mode
+- name: Upload NGINX config
   ansible.builtin.template:
     src: nginx-dev.conf.j2
     dest: /etc/nginx/sites-available/default

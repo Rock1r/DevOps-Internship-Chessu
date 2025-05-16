@@ -1,18 +1,15 @@
 server {
-    listen 80;
-    server_name 192.168.50.2;
+    listen 3002;
+    server_name localhost;
 
     location / {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header Cookie $http_cookie;
+        proxy_pass http://localhost:3000/;
+        include proxy_params;
     }
 
-    location /v1/ {
+    location /api/ {
         proxy_pass http://192.168.50.3:3001/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
+        include proxy_params;
         proxy_set_header Cookie $http_cookie;
     }
 }

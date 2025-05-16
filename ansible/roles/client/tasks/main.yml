@@ -1,3 +1,9 @@
+- name: install dependencies
+  ansible.builtin.command: pnpm install:client
+  args:
+    chdir: /home/{{ USERNAME }}/chessu/
+  become: true
+
 - name: Create .env file
   ansible.builtin.template:
     src: .env.j2
@@ -7,7 +13,26 @@
     mode: '0644'
   become: true
 
-- name: Start application
-  ansible.builtin.command: pm2 start --name client "pnpm dev:client"
+- name: Build client
+  ansible.builtin.command: pnpm build
   args:
-    chdir: "/home/{{ USERNAME }}/chessu/"
+    chdir: /home/{{ USERNAME }}/chessu/client/
+  become: true
+
+- name: Create systemd service for Next.js client
+  ansible.builtin.template:
+    src: chessu-client.service.j2
+    dest: /etc/systemd/system/chessu-client.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload systemd daemon
+  become: true
+
+- name: Enable and start client service
+  ansible.builtin.systemd:
+    name: chessu-client
+    enabled: true
+    state: started
+
+- import_tasks: nginx.yml

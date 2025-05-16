@@ -1,3 +1,9 @@
+- name: install dependencies
+  ansible.builtin.command: pnpm install:server
+  args:
+    chdir: /home/{{ USERNAME }}/chessu/
+  become: true
+
 - name: Create .env file
   ansible.builtin.template:
     src: .env.j2
@@ -7,7 +13,31 @@
     mode: '0644'
   become: true
 
-- name: Start application
-  ansible.builtin.command: pm2 start --name server "pnpm dev:server"
+- name: Install pm2
+  ansible.builtin.npm:
+    name: pm2
+    global: true
+    state: present
+
+- name: Build server
+  ansible.builtin.command: pnpm build
   args:
-    chdir: "/home/{{ USERNAME }}/chessu/"
+    chdir: /home/{{ USERNAME }}/chessu/server/
+  become: true
+
+- name: Create systemd service for backend server
+  ansible.builtin.template:
+    src: chessu-server.service.j2
+    dest: /etc/systemd/system/chessu-server.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  notify: Reload systemd daemon
+
+- name: Enable and start backend server service
+  ansible.builtin.systemd:
+    name: chessu-server
+    enabled: true
+    state: started
+  become: true
