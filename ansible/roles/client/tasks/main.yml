@@ -14,25 +14,23 @@
   become: true
 
 - name: Build client
-  ansible.builtin.command: pnpm build
+  ansible.builtin.command: pnpm build:client
   args:
-    chdir: /home/{{ USERNAME }}/chessu/client/
+    chdir: /home/{{ USERNAME }}/chessu/
   become: true
 
-- name: Create systemd service for Next.js client
-  ansible.builtin.template:
-    src: chessu-client.service.j2
-    dest: /etc/systemd/system/chessu-client.service
-    owner: root
-    group: root
-    mode: '0644'
-  notify: Reload systemd daemon
+- name: Start frontend with PM2
+  ansible.builtin.command: pm2 start --name client "pnpm start"
+  args:
+    chdir: /home/{{ USERNAME }}/chessu/client
   become: true
 
-- name: Enable and start client service
-  ansible.builtin.systemd:
-    name: chessu-client
-    enabled: true
-    state: started
+- name: Save PM2 client process list
+  ansible.builtin.command: pm2 save
+  become: true
+
+- name: Setup PM2 startup for client
+  ansible.builtin.command: pm2 startup systemd -u {{ USERNAME }} --hp /home/{{ USERNAME }}
+  become: true
 
 - import_tasks: nginx.yml

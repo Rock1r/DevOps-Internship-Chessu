@@ -13,31 +13,22 @@
     mode: '0644'
   become: true
 
-- name: Install pm2
-  ansible.builtin.npm:
-    name: pm2
-    global: true
-    state: present
-
 - name: Build server
-  ansible.builtin.command: pnpm build
+  ansible.builtin.command: pnpm build:server
   args:
-    chdir: /home/{{ USERNAME }}/chessu/server/
+    chdir: /home/{{ USERNAME }}/chessu/
   become: true
 
-- name: Create systemd service for backend server
-  ansible.builtin.template:
-    src: chessu-server.service.j2
-    dest: /etc/systemd/system/chessu-server.service
-    owner: root
-    group: root
-    mode: '0644'
+- name: Start backend with PM2
+  ansible.builtin.command: pm2 start --name server "pnpm start"
+  args:
+    chdir: /home/{{ USERNAME }}/chessu/server
   become: true
-  notify: Reload systemd daemon
 
-- name: Enable and start backend server service
-  ansible.builtin.systemd:
-    name: chessu-server
-    enabled: true
-    state: started
+- name: Save PM2 process list
+  ansible.builtin.command: pm2 save
+  become: true
+
+- name: Setup PM2 to launch on startup
+  ansible.builtin.command: pm2 startup systemd -u {{ USERNAME }} --hp /home/{{ USERNAME }}
   become: true
