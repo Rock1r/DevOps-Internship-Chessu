@@ -26,8 +26,3 @@
     global: true
     state: present
 
-- name: Install dependencies
-  community.general.pnpm:
-    path: "/home/{{ USERNAME }}/chessu/"
-    production: false
-  become_user: root
