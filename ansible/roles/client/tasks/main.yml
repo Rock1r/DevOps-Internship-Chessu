@@ -19,18 +19,6 @@
     chdir: /home/{{ USERNAME }}/chessu/
   become: true
 
-- name: Start frontend with PM2
-  ansible.builtin.command: pm2 start --name client "pnpm start"
-  args:
-    chdir: /home/{{ USERNAME }}/chessu/client
-  become: true
-
-- name: Save PM2 client process list
-  ansible.builtin.command: pm2 save
-  become: true
-
-- name: Setup PM2 startup for client
-  ansible.builtin.command: pm2 startup systemd -u {{ USERNAME }} --hp /home/{{ USERNAME }}
-  become: true
+- import_tasks: pm2.yml
 
 - import_tasks: nginx.yml

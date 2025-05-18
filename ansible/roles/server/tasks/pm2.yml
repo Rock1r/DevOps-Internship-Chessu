@@ -1,0 +1,13 @@
+- name: Start backend with PM2
+  ansible.builtin.command: pm2 start --name server "pnpm start"
+  args:
+    chdir: /home/{{ USERNAME }}/chessu/server
+  become: true
+
+- name: Save PM2 process list
+  ansible.builtin.command: pm2 save
+  become: true
+
+- name: Setup PM2 to launch on startup
+  ansible.builtin.command: pm2 startup systemd -u {{ USERNAME }} --hp /home/{{ USERNAME }}
+  become: true
