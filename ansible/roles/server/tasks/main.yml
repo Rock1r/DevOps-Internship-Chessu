@@ -1,3 +1,9 @@
+- name: install dependencies
+  ansible.builtin.command: pnpm install:server
+  args:
+    chdir: /home/{{ USERNAME }}/chessu/
+  become: true
+
 - name: Create .env file
   ansible.builtin.template:
     src: .env.j2
@@ -7,7 +13,10 @@
     mode: '0644'
   become: true
 
-- name: Start application
-  ansible.builtin.command: pm2 start --name server "pnpm dev:server"
+- name: Build server
+  ansible.builtin.command: pnpm build:server
   args:
-    chdir: "/home/{{ USERNAME }}/chessu/"
+    chdir: /home/{{ USERNAME }}/chessu/
+  become: true
+
+- import_tasks: pm2.yml

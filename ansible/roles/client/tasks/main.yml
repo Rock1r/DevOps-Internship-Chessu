@@ -1,13 +1,24 @@
+- name: install dependencies
+  ansible.builtin.command: pnpm install:client
+  args:
+    chdir: /home/{{ USERNAME }}/chessu/
+  become: true
+
 - name: Create .env file
   ansible.builtin.template:
     src: .env.j2
-    dest: /home/{{ USERNAME }}/chessu/server/.env
+    dest: /home/{{ USERNAME }}/chessu/client/.env
     owner: "{{ USERNAME }}"
     group: "{{ USERNAME }}"
     mode: '0644'
   become: true
 
-- name: Start application
-  ansible.builtin.command: pm2 start --name client "pnpm dev:client"
+- name: Build client
+  ansible.builtin.command: pnpm build:client
   args:
-    chdir: "/home/{{ USERNAME }}/chessu/"
+    chdir: /home/{{ USERNAME }}/chessu/
+  become: true
+
+- import_tasks: pm2.yml
+
+- import_tasks: nginx.yml
