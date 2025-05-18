@@ -13,12 +13,7 @@
     mode: '0644'
   become: true
 
-- name: Build client
-  ansible.builtin.command: pnpm build:client
-  args:
-    chdir: /home/{{ USERNAME }}/chessu/
-  become: true
 
-- import_tasks: pm2.yml
+- import_tasks: setup.yml
 
 - import_tasks: nginx.yml

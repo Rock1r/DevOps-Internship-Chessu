@@ -1,3 +1,19 @@
 - import_tasks: user.yml
 - import_tasks: workdir.yml
 - import_tasks: dependencies.yml
+
+- name: Create resurrector service
+  ansible.builtin.template:
+    src: chessus-resurrector.service.j2
+    dest: /etc/systemd/system/chessus-resurrector.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Enable and start resurrector service
+  ansible.builtin.systemd:
+    name: chessus-resurrector
+    state: started
+    enabled: true
+  become: true
