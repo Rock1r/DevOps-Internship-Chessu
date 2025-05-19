@@ -18,8 +18,6 @@ Vagrant.configure("2") do |config|
       vb.memory = "2048"
       vb.cpus = 2
     end
-    client.vm.network "forwarded_port", guest: 3000, host: 3000
-    client.vm.network "forwarded_port", guest: 3002, host: 3002
     client.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
@@ -31,7 +29,6 @@ Vagrant.configure("2") do |config|
       vb.cpus = 2
     end
 
-    server.vm.network "forwarded_port", guest: 3001, host: 3001
     server.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
@@ -40,12 +37,13 @@ Vagrant.configure("2") do |config|
     ansible.vm.network "private_network", ip: "192.168.50.1"
     ansible.vm.synced_folder ".", "/vagrant"
     ansible.vm.provider "virtualbox" do |vb|
-      vb.memory = "2048"
-      vb.cpus = 2
+      vb.memory = "4096"
+      vb.cpus = 4
     end
     ansible.vm.provision "shell", inline: <<-SHELL
       apt-get update
       apt-get install -y python3-pip
+      pip3 install passlib
 
       pip3 install ansible
 

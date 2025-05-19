@@ -1,15 +1,21 @@
 - name: Build client
-  ansible.builtin.command: pnpm build:client
+  command: pnpm build:client
   args:
     chdir: /home/{{ USERNAME }}/chessu/
   become: true
 
-- name: Start client with PM2
-  ansible.builtin.command: pm2 start --name client "pnpm start"
+- name: Start or restart client with PM2
+  command: pm2 start --name client "pnpm start"
   args:
     chdir: /home/{{ USERNAME }}/chessu/client
   become: true
 
 - name: Save PM2 process list
-  ansible.builtin.command: pm2 save
+  command: pm2 save
+  become: true
+
+- name: Run pm2 startup
+  command: pm2 startup
+  args:
+    creates: /etc/systemd/system/pm2-root.service
   become: true
