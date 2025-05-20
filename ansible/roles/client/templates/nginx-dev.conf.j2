@@ -1,3 +1,9 @@
+upstream backend {
+    ip_hash;
+    server {{ backend_url }};
+    server {{ backend2_url }};
+}
+
 server {
 
     listen {{ nginx_port }};
@@ -5,7 +11,7 @@ server {
 
 
     location /socket.io {
-        proxy_pass {{ backend_url }}/socket.io/;
+        proxy_pass http://backend/socket.io/;
 
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -16,13 +22,13 @@ server {
     }
 
     location / {
-        proxy_pass {{ frontend_url }};
+        proxy_pass http://{{ frontend_url }};
         include proxy_params;
         proxy_set_header Cookie $http_cookie;
     }
 
     location /v1/ {
-        proxy_pass {{ backend_url }}/v1/;
+        proxy_pass http://backend/v1/;
 
         include proxy_params;
         proxy_set_header Cookie $http_cookie;
