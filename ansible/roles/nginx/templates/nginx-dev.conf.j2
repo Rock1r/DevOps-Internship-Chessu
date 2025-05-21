@@ -1,14 +1,12 @@
 upstream backend {
-    ip_hash;
-    server {{ backend_url }};
-    server {{ backend2_url }};
+    {% for host in groups['server'] %}
+    server {{ host }}:3001;
+    {% endfor %}
 }
 
 server {
-
     listen {{ nginx_port }};
-    server_name {{ nginx_server_name }};
-
+    server_name {{ groups['nginx'][0] }};
 
     location /socket.io {
         proxy_pass http://backend/socket.io/;
@@ -22,7 +20,7 @@ server {
     }
 
     location / {
-        proxy_pass http://{{ frontend_url }};
+        proxy_pass http://{{ groups['client'][0] }};
         include proxy_params;
         proxy_set_header Cookie $http_cookie;
     }

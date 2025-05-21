@@ -1,5 +1,1 @@
 nginx_port: "{{ nginx.PORT }}"
-nginx_server_name: "{{ nginx.ADDRESS }}"
-backend_url: "{{ nginx.BACKEND }}"
-backend2_url: "{{ nginx.BACKEND2 }}"
-frontend_url: "{{ nginx.FRONTEND }}"

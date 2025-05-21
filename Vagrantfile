@@ -42,6 +42,16 @@ Vagrant.configure("2") do |config|
 
     server2.vm.synced_folder ".", "/vagrant", disabled: true
   end
+  config.vm.define "nginx" do |nginx|
+    nginx.vm.box = "ubuntu/jammy64"
+    nginx.vm.network "private_network", ip: "192.168.50.8"
+    nginx.vm.provider "virtualbox" do |vb|
+      vb.memory = "2048"
+      vb.cpus = 2
+    end
+
+    nginx.vm.synced_folder ".", "/vagrant", disabled: true
+  end
 
   config.vm.define "ansible" do |ansible|
     ansible.vm.box = "ubuntu/jammy64"
