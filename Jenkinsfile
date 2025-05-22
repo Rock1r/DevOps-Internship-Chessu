@@ -22,14 +22,20 @@ pipeline {
                 stage('Frontend Install') {
                     steps {
                         dir('client') {
-                            sh 'pnpm install --frozen-lockfile'
+                            sh '''
+                            npm install -g pnpm
+                            pnpm install --frozen-lockfile
+                            '''
                         }
                     }
                 }
                 stage('Backend Install') {
                     steps {
                         dir('server') {
-                            sh 'pnpm install --frozen-lockfile'
+                            sh '''
+                            npm install -g pnpm
+                            pnpm install --frozen-lockfile
+                            '''
                         }
                     }
                 }
