@@ -32,7 +32,22 @@ Vagrant.configure("2") do |config|
     server.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
-    config.vm.define "jenkins" do |jenkins|
+config.vm.define "node" do |node|
+    node.vm.box = "ubuntu/jammy64"
+    node.vm.hostname = "node"
+    node.vm.network "private_network", ip: "192.168.50.10"
+    node.vm.synced_folder ".", "/vagrant"
+    node.vm.provider "virtualbox" do |vb|
+      vb.memory = "4096"
+      vb.cpus = 4
+    end
+    node.vm.provision "shell", inline: <<-SHELL
+      sudo apt update
+sudo apt install fontconfig openjdk-21-jre -y 
+    SHELL
+  end
+
+  config.vm.define "jenkins" do |jenkins|
     jenkins.vm.box = "ubuntu/jammy64"
     jenkins.vm.network "private_network", ip: "192.168.50.1"
     jenkins.vm.network "forwarded_port", guest: 8080, host: 8080
