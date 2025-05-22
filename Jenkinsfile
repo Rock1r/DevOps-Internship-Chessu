@@ -80,7 +80,7 @@ pipeline {
 
         stage('Build Backend') {
             steps {
-                dir('backend') {
+                dir('server') {
                     sh 'pnpm build'
                 }
             }
