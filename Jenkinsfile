@@ -29,8 +29,7 @@ pipeline {
                 stage('Backend Install') {
                     steps {
                         dir('server') {
-                            sh 'pnpm install --frozen-lockfile
-'
+                            sh 'pnpm install --frozen-lockfile'
                         }
                     }
                 }
