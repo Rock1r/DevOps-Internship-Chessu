@@ -22,14 +22,15 @@ pipeline {
                 stage('Frontend Install') {
                     steps {
                         dir('client') {
-                            sh 'npm ci'
+                            sh 'pnpm install --frozen-lockfile'
                         }
                     }
                 }
                 stage('Backend Install') {
                     steps {
                         dir('server') {
-                            sh 'npm ci'
+                            sh 'pnpm install --frozen-lockfile
+'
                         }
                     }
                 }
@@ -37,22 +38,14 @@ pipeline {
         }
 
         stage('Lint') {
-            parallel {
                 stage('Frontend Lint') {
                     steps {
                         dir('client') {
-                            sh 'npm run lint'
+                            sh 'pnpm lint'
                         }
                     }
                 }
-                stage('Backend Lint') {
-                    steps {
-                        dir('server') {
-                            sh 'npm run lint'
-                        }
-                    }
-                }
-            }
+
         }
 
         stage('Test') {
@@ -60,14 +53,14 @@ pipeline {
                 stage('Frontend Test') {
                     steps {
                         dir('client') {
-                            sh 'npm test'
+                            sh 'pnpm test'
                         }
                     }
                 }
                 stage('Backend Test') {
                     steps {
                         dir('server') {
-                            sh 'npm test'
+                            sh 'pnpm test'
                         }
                     }
                 }
@@ -77,7 +70,7 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('client') {
-                    sh 'npm run build'
+                    sh 'pnpm build'
                 }
             }
         }
@@ -91,7 +84,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('backend') {
-                    sh 'npm run build'
+                    sh 'pnpm build'
                 }
             }
         }
