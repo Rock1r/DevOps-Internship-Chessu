@@ -37,14 +37,11 @@ pipeline {
         }
 
         stage('Lint') {
-                stage('Frontend Lint') {
-                    steps {
-                        dir('client') {
-                            sh 'pnpm lint'
-                        }
-                    }
+            steps {
+                dir('client') {
+                    sh 'pnpm lint'
                 }
-
+            }
         }
 
         stage('Test') {
