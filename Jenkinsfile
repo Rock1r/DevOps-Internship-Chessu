@@ -70,7 +70,7 @@ pipeline {
                 script {
                     setGitHubPullRequestStatus(
                         context: "tests",
-                        status: "PENDING",
+                        state: "PENDING",
                         description: "Running tests",
                         sha: env.GIT_COMMIT
                     )
@@ -100,7 +100,7 @@ pipeline {
                     script {
                         setGitHubPullRequestStatus(
                             context: "tests",
-                            status: "SUCCESS",
+                            state: "SUCCESS",
                             description: "Tests passed",
                             sha: env.GIT_COMMIT
                         )
@@ -110,7 +110,7 @@ pipeline {
                     script {
                         setGitHubPullRequestStatus(
                             context: "tests",
-                            status: "FAILURE",
+                            stat: "FAILURE",
                             description: "Tests failed",
                             sha: env.GIT_COMMIT
                         )
