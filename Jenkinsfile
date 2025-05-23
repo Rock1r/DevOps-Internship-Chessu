@@ -1,6 +1,6 @@
 pipeline {
-    agent{
-        node{
+    agent {
+        node {
             label 'node.js'
         }
     }
@@ -64,15 +64,20 @@ pipeline {
                 sh 'pnpm format'
             }
         }
-        
+
         stage('Notify Test Start') {
             steps {
                 script {
-                    githubNotify context: 'tests', status: 'PENDING', description: 'Running tests'
+                    setGitHubPullRequestStatus(
+                        context: "tests",
+                        status: "PENDING",
+                        description: "Running tests",
+                        sha: env.GIT_COMMIT
+                    )
                 }
             }
         }
-        
+
         stage('Test') {
             parallel {
                 stage('Frontend Test') {
@@ -93,17 +98,26 @@ pipeline {
             post {
                 success {
                     script {
-                        githubNotify context: 'tests', status: 'SUCCESS', description: 'Tests passed'
+                        setGitHubPullRequestStatus(
+                            context: "tests",
+                            status: "SUCCESS",
+                            description: "Tests passed",
+                            sha: env.GIT_COMMIT
+                        )
                     }
                 }
                 failure {
                     script {
-                        githubNotify context: 'tests', status: 'FAILURE', description: 'Tests failed'
+                        setGitHubPullRequestStatus(
+                            context: "tests",
+                            status: "FAILURE",
+                            description: "Tests failed",
+                            sha: env.GIT_COMMIT
+                        )
                     }
                 }
             }
         }
-        
 
         stage('Build Frontend') {
             steps {
