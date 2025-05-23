@@ -10,6 +10,21 @@ pipeline {
     }
 
     stages {
+        stage('Set Env') {
+            steps {
+                script {
+                    if (env.BRANCH_NAME == 'main') {
+                        env.NODE_ENV = 'production'
+                    } else if (env.BRANCH_NAME == 'dev') {
+                        env.NODE_ENV = 'staging'
+                    } else {
+                        env.NODE_ENV = 'test'
+                    }
+
+                    echo "Environment set to ${env.NODE_ENV}"
+                }
+            }
+        }
 
         stage('Checkout') {
             steps {
@@ -39,13 +54,23 @@ pipeline {
         stage('Lint') {
             steps {
                 dir('client') {
-                    sh 'pnpm add -D eslint-plugin-jest'
                     sh 'pnpm lint'
                 }
             }
         }
 
+        stage('Format') {
+            steps {
+                sh 'pnpm format'
+            }
+        }
+
         stage('Test') {
+            steps {
+                script {
+                    githubNotify context: 'tests', status: 'PENDING', description: 'Running tests'
+                }
+            }
             parallel {
                 stage('Frontend Test') {
                     steps {
@@ -59,6 +84,18 @@ pipeline {
                         dir('server') {
                             sh 'pnpm test'
                         }
+                    }
+                }
+            }
+            post {
+                success {
+                    script {
+                        githubNotify context: 'tests', status: 'SUCCESS', description: 'Tests passed'
+                    }
+                }
+                failure {
+                    script {
+                        githubNotify context: 'tests', status: 'FAILURE', description: 'Tests failed'
                     }
                 }
             }
@@ -95,7 +132,7 @@ pipeline {
 
     post {
         success {
-            echo "Release build for tag ${env.TAG_NAME} completed."
+            echo "Build completed."
         }
         failure {
             echo "Build failed."
