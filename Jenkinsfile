@@ -68,11 +68,7 @@ pipeline {
         stage('Notify Test Start') {
             steps {
                 script {
-                    setGitHubPullRequestStatus(
-                        context: "tests",
-                        state: "PENDING",
-                        description: "Running tests",
-                    )
+                    githubNotify context: 'tests', status: 'PENDING', description: 'Running tests'
                 }
             }
         }
@@ -97,20 +93,12 @@ pipeline {
             post {
                 success {
                     script {
-                        setGitHubPullRequestStatus(
-                            context: "tests",
-                            state: "SUCCESS",
-                            description: "Tests passed",
-                        )
+                        githubNotify context: 'tests', status: 'SUCCESS', description: 'Tests passed'
                     }
                 }
                 failure {
                     script {
-                        setGitHubPullRequestStatus(
-                            context: "tests",
-                            state: "FAILURE",
-                            description: "Tests failed",
-                        )
+                        githubNotify context: 'tests', status: 'FAILURE', description: 'Tests failed'
                     }
                 }
             }
