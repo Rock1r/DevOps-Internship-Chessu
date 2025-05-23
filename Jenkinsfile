@@ -68,11 +68,14 @@ pipeline {
         stage('Notify Test Start') {
             steps {
                 script {
-                    githubNotify context: 'tests', status: 'PENDING', description: 'Running tests'
+                    setGitHubPullRequestStatus(
+                        context: "tests",
+                        state: "PENDING"
+                    )
                 }
             }
         }
-
+        
         stage('Test') {
             parallel {
                 stage('Frontend Test') {
@@ -93,16 +96,23 @@ pipeline {
             post {
                 success {
                     script {
-                        githubNotify context: 'tests', status: 'SUCCESS', description: 'Tests passed'
+                        setGitHubPullRequestStatus(
+                            context: "tests",
+                            state: "SUCCESS"
+                        )
                     }
                 }
                 failure {
                     script {
-                        githubNotify context: 'tests', status: 'FAILURE', description: 'Tests failed'
+                        setGitHubPullRequestStatus(
+                            context: "tests",
+                            state: "FAILURE"
+                        )
                     }
                 }
             }
         }
+
 
         stage('Build Frontend') {
             steps {
