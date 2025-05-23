@@ -64,13 +64,16 @@ pipeline {
                 sh 'pnpm format'
             }
         }
-
-        stage('Test') {
+        
+        stage('Notify Test Start') {
             steps {
                 script {
                     githubNotify context: 'tests', status: 'PENDING', description: 'Running tests'
                 }
             }
+        }
+        
+        stage('Test') {
             parallel {
                 stage('Frontend Test') {
                     steps {
@@ -100,6 +103,7 @@ pipeline {
                 }
             }
         }
+        
 
         stage('Build Frontend') {
             steps {
