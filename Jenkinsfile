@@ -54,6 +54,7 @@ pipeline {
         stage('Lint') {
             steps {
                 dir('client') {
+                    sh 'pnpm add -D eslint-plugin-jest'
                     sh 'pnpm lint'
                 }
             }
