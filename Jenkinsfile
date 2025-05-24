@@ -66,17 +66,6 @@ pipeline {
             }
         }
 
-        stage('Notify Test Start') {
-            steps {
-                script {
-                    setGitHubPullRequestStatus(
-                        context: "tests",
-                        state: "PENDING"
-                    )
-                }
-            }
-        }
-        
         stage('Test') {
             parallel {
                 stage('Frontend Test') {
@@ -94,26 +83,7 @@ pipeline {
                     }
                 }
             }
-            post {
-                success {
-                    script {
-                        setGitHubPullRequestStatus(
-                            context: "tests",
-                            state: "SUCCESS"
-                        )
-                    }
-                }
-                failure {
-                    script {
-                        setGitHubPullRequestStatus(
-                            context: "tests",
-                            state: "FAILURE"
-                        )
-                    }
-                }
-            }
         }
-
 
         stage('Build Frontend') {
             steps {
