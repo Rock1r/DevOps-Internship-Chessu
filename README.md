@@ -1,4 +1,4 @@
-Forked from project by Nathaniel Tampus (MIT License)
+##Forked from project by Nathaniel Tampus (MIT License)
 
 <h1 align="center">
   <img src="./assets/chessu.png" alt="chessu" height="128" />
