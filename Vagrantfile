@@ -2,10 +2,12 @@ Vagrant.configure("2") do |config|
   config.vm.define "db" do |db|
     db.vm.box = "ubuntu/jammy64"
     db.vm.network "private_network", ip: "192.168.50.4"
+
     db.vm.provider "virtualbox" do |vb|
       vb.memory = "2048"
       vb.cpus = 2
     end
+
     db.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
@@ -26,76 +28,11 @@ Vagrant.configure("2") do |config|
       vb.memory = "2048"
       vb.cpus = 2
     end
+
     server.vm.synced_folder ".", "/vagrant", disabled: true
   end
 
-  config.vm.define "server2" do |server2|
-    server2.vm.box = "ubuntu/jammy64"
-    server2.vm.network "private_network", ip: "192.168.50.5"
-    server2.vm.provider "virtualbox" do |vb|
-      vb.memory = "2048"
-      vb.cpus = 2
-    end
-    server2.vm.synced_folder ".", "/vagrant", disabled: true
-  end
-
-  config.vm.define "nginx" do |nginx|
-    nginx.vm.box = "ubuntu/jammy64"
-    nginx.vm.network "private_network", ip: "192.168.50.8"
-    nginx.vm.provider "virtualbox" do |vb|
-      vb.memory = "2048"
-      vb.cpus = 2
-    end
-    nginx.vm.synced_folder ".", "/vagrant", disabled: true
-  end
-
-  config.vm.define "ansible" do |ansible|
-    ansible.vm.box = "ubuntu/jammy64"
-    ansible.vm.network "private_network", ip: "192.168.50.6"
-    ansible.vm.synced_folder ".", "/vagrant"
-    ansible.vm.provider "virtualbox" do |vb|
-      vb.memory = "4096"
-      vb.cpus = 4
-    end
-    ansible.vm.provision "shell", inline: <<-SHELL
-      apt-get update
-      apt-get install -y python3-pip
-      pip3 install passlib
-      pip3 install ansible
-      ansible-galaxy collection install community.postgresql:3.14.0
-      ansible-galaxy collection install community.general
-      cp /vagrant/ansible/.vault_pass.txt /tmp/.vault_pass.txt
-      chmod 600 /tmp/.vault_pass.txt
-      if ! grep -q '^$ANSIBLE_VAULT;' /vagrant/ansible/secrets.yml; then
-        ansible-vault encrypt /vagrant/ansible/secrets.yml --vault-password-file /tmp/.vault_pass.txt
-      fi
-      ansible-playbook -i /vagrant/ansible/hosts.ini /vagrant/ansible/master.yml -e "@/vagrant/ansible/secrets.yml" --vault-password-file /tmp/.vault_pass.txt
-      ansible-vault decrypt /vagrant/ansible/secrets.yml --vault-password-file /tmp/.vault_pass.txt
-      rm -f /tmp/.vault_pass.txt
-    SHELL
-  end
-
-  config.vm.define "jenkins" do |jenkins|
-    jenkins.vm.box = "ubuntu/jammy64"
-    jenkins.vm.network "private_network", ip: "192.168.50.7"
-    jenkins.vm.network "forwarded_port", guest: 8080, host: 8080
-    jenkins.vm.synced_folder ".", "/vagrant"
-    jenkins.vm.provider "virtualbox" do |vb|
-      vb.memory = "4096"
-      vb.cpus = 4
-    end
-    jenkins.vm.provision "shell", inline: <<-SHELL
-      sudo apt update
-      sudo apt install fontconfig openjdk-21-jre -y
-      sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
-      echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
-      sudo apt-get update
-      sudo apt-get install jenkins -y
-      sudo systemctl start jenkins
-    SHELL
-  end
-
-  config.vm.define "node" do |node|
+config.vm.define "node" do |node|
     node.vm.box = "ubuntu/jammy64"
     node.vm.hostname = "node"
     node.vm.network "private_network", ip: "192.168.50.10"
@@ -106,7 +43,31 @@ Vagrant.configure("2") do |config|
     end
     node.vm.provision "shell", inline: <<-SHELL
       sudo apt update
-      sudo apt install fontconfig openjdk-21-jre -y
+sudo apt install fontconfig openjdk-21-jre -y 
+    SHELL
+  end
+
+  config.vm.define "jenkins" do |jenkins|
+    jenkins.vm.box = "ubuntu/jammy64"
+    jenkins.vm.network "private_network", ip: "192.168.50.1"
+    jenkins.vm.network "forwarded_port", guest: 8080, host: 8080
+    jenkins.vm.synced_folder ".", "/vagrant"
+    jenkins.vm.provider "virtualbox" do |vb|
+      vb.memory = "4096"
+      vb.cpus = 4
+    end
+    jenkins.vm.provision "shell", inline: <<-SHELL
+      sudo apt update
+sudo apt install fontconfig openjdk-21-jre -y 
+
+sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt-get update
+sudo apt-get install jenkins -y
+sudo systemctl start jenkins
     SHELL
   end
 end

@@ -13,4 +13,7 @@
     mode: '0644'
   become: true
 
+
 - import_tasks: setup.yml
+
+- import_tasks: nginx.yml

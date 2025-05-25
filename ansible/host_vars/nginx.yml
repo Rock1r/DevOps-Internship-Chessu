@@ -1,1 +1,4 @@
 nginx_port: "{{ nginx.PORT }}"
+nginx_server_name: "{{ nginx.ADDRESS }}"
+backend_url: "{{ nginx.BACKEND }}"
+frontend_url: "{{ nginx.FRONTEND }}"

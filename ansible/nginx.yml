@@ -1,6 +1,0 @@
-- hosts: nginx
-  become: yes
-  vars_files:
-    - ./host_vars/nginx.yml
-  roles:
-    - nginx
