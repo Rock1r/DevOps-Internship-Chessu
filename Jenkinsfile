@@ -5,6 +5,10 @@ pipeline {
         }
     }
 
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+    
     environment {
         NODE_ENV = 'test'
     }
