@@ -1,11 +1,15 @@
+upstream backend {
+    {% for host in groups['server'] %}
+    server {{ host }}:3001;
+    {% endfor %}
+}
+
 server {
-
     listen {{ nginx_port }};
-    server_name {{ nginx_server_name }};
-
+    server_name {{ groups['nginx'][0] }};
 
     location /socket.io {
-        proxy_pass {{ backend_url }}/socket.io/;
+        proxy_pass http://backend/socket.io/;
 
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -16,13 +20,13 @@ server {
     }
 
     location / {
-        proxy_pass {{ frontend_url }};
+        proxy_pass http://{{ groups['client'][0] }};
         include proxy_params;
         proxy_set_header Cookie $http_cookie;
     }
 
     location /v1/ {
-        proxy_pass {{ backend_url }}/v1/;
+        proxy_pass http://backend/v1/;
 
         include proxy_params;
         proxy_set_header Cookie $http_cookie;
