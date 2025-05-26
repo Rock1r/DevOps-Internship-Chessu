@@ -39,7 +39,7 @@ pipeline {
         stage('Lint') {
             steps {
                 dir('client') {
-                    sh 'pnpm lin'
+                    sh 'pnpm lint'
                 }
             }
         }
