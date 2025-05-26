@@ -1,0 +1,3 @@
+CORS_ORIGIN: "{{ backend.CORS_ORIGIN }}"
+PORT: "{{ backend.PORT }}"
+SESSION_SECRET: "{{ backend.SESSION_SECRET }}"

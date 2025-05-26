@@ -41,3 +41,9 @@ dist-ssr
 *.sln
 *.sw?
 *.pem
+
+.vagrant
+.cache
+
+secrets.yml
+.vault_pass.txt

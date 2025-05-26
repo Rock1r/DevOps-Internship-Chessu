@@ -1,0 +1,28 @@
+- name: Download NodeSource setup script
+  ansible.builtin.get_url:
+    url: https://deb.nodesource.com/setup_22.x
+    dest: /tmp/nodesource_setup.sh
+    mode: '0755'
+
+- name: Run NodeSource setup script
+  ansible.builtin.command: /tmp/nodesource_setup.sh
+  become: yes
+
+- name: Install Node.js
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: yes
+
+- name: Install pnpm
+  ansible.builtin.npm:
+    name: pnpm
+    global: true
+    state: present
+
+- name: Install pm2
+  ansible.builtin.npm:
+    name: pm2
+    global: true
+    state: present
+

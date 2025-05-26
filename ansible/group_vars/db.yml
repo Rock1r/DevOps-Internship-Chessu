@@ -1,0 +1,4 @@
+PGHOST: "{{ shared.PGHOST }}"
+PGUSER: "{{ shared.PGUSER }}"
+PGPASSWORD: "{{ shared.PGPASSWORD }}"
+PGNAME: "{{ shared.PGNAME }}"

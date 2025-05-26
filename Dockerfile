@@ -10,8 +10,8 @@ RUN apk update && \
     corepack enable && corepack prepare pnpm@latest --activate && \
     pnpm config set store-dir /opt/chessu/.pnpm-store && \
     pnpm install -g pnpm@latest && \
-    pnpm install --unsafe-perm
+    pnpm install --unsafe-perm && \
+    pnpm --filter server build && \
+    pnpm --filter client build
 
-ENTRYPOINT ["pnpm"]
-
-CMD ["start"]
+CMD ["pnpm", "start"]

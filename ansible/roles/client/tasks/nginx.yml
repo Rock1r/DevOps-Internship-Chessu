@@ -1,0 +1,14 @@
+- name: Install nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: true
+
+- name: Upload NGINX config
+  ansible.builtin.template:
+    src: nginx-dev.conf.j2
+    dest: /etc/nginx/sites-available/default
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart nginx
