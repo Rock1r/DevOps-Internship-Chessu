@@ -1,3 +1,12 @@
 - import_tasks: install.yml
 - import_tasks: configure.yml
 - import_tasks: setup.yml
+
+- name: Set password for postgres superuser
+  community.postgresql.postgresql_user:
+    name: postgres
+    password: "{{ DB_SUPERUSER_PASSWORD }}"
+    encrypted: true
+    role_attr_flags: SUPERUSER
+  become: true
+  become_user: postgres

@@ -1,1 +1,2 @@
 postgresql_version: "14"
+DB_SUPERUSER_PASSWORD: "{{ db.DB_SUPERUSER_PASSWORD}}"
