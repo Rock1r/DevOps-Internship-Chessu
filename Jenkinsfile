@@ -6,7 +6,7 @@ pipeline {
     }
 
     triggers {
-        pollSCM('H/5 * * * *')
+        pollSCM('H/1 * * * *')
     }
     
     environment {
@@ -14,21 +14,6 @@ pipeline {
     }
 
     stages {
-        stage('Set Env') {
-            steps {
-                script {
-                    if (env.BRANCH_NAME == 'main') {
-                        env.NODE_ENV = 'production'
-                    } else if (env.BRANCH_NAME == 'dev') {
-                        env.NODE_ENV = 'staging'
-                    } else {
-                        env.NODE_ENV = 'test'
-                    }
-
-                    echo "Environment set to ${env.NODE_ENV}"
-                }
-            }
-        }
 
         stage('Checkout') {
             steps {
@@ -58,7 +43,6 @@ pipeline {
         stage('Lint') {
             steps {
                 dir('client') {
-                    sh 'pnpm add -D eslint-plugin-jest'
                     sh 'pnpm lint'
                 }
             }
@@ -86,34 +70,6 @@ pipeline {
                         }
                     }
                 }
-            }
-        }
-
-        stage('Build Frontend') {
-            steps {
-                dir('client') {
-                    sh 'pnpm build'
-                }
-            }
-        }
-
-        stage('Archive Frontend') {
-            steps {
-                archiveArtifacts artifacts: 'client/.next/**', fingerprint: true
-            }
-        }
-
-        stage('Build Backend') {
-            steps {
-                dir('server') {
-                    sh 'pnpm build'
-                }
-            }
-        }
-
-        stage('Archive Backend') {
-            steps {
-                archiveArtifacts artifacts: 'server/dist/**', fingerprint: true
             }
         }
     }
