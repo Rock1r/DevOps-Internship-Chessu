@@ -69,13 +69,4 @@ pipeline {
             }
         }
     }
-
-    post {
-        success {
-            echo "Build completed."
-        }
-        failure {
-            echo "Build failed."
-        }
-    }
 }
