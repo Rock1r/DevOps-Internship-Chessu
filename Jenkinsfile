@@ -6,11 +6,7 @@ pipeline {
     }
 
     triggers {
-        pollSCM('H/1 * * * *')
-    }
-    
-    environment {
-        NODE_ENV = 'test'
+        pollSCM('H/5 * * * *')
     }
 
     stages {
