@@ -1,16 +1,38 @@
 - name: install dependencies
   ansible.builtin.command: pnpm install:server
   args:
-    chdir: /home/{{ USERNAME }}/chessu/
+    chdir: /home/{{ username }}/chessu/
+  become: true
+
+- name: Install dependencies for autoinstrumentation
+  ansible.builtin.command: >
+    pnpm install --save
+    @opentelemetry/auto-instrumentations-node
+    @opentelemetry/sdk-node
+    @opentelemetry/exporter-trace-otlp-proto
+    @opentelemetry/exporter-metrics-otlp-proto
+    @opentelemetry/sdk-metrics
+  args:
+    chdir: /home/{{ username }}/chessu/server
+  become: true
+  
+- name: Create instrumentation.js file
+  ansible.builtin.template:
+    src: instrumentation.js.j2
+    dest: /home/{{ username }}/chessu/server/instrumentation.js
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: '0644'
   become: true
 
 - name: Create .env file
   ansible.builtin.template:
     src: .env.j2
-    dest: /home/{{USERNAME}}/chessu/server/.env
-    owner: "{{ USERNAME }}"
-    group: "{{ USERNAME }}"
+    dest: /home/{{username}}/chessu/server/.env
+    owner: "{{ username }}"
+    group: "{{ username }}"
     mode: '0644'
   become: true
 
 - import_tasks: setup.yml
+- import_tasks: otel.yml

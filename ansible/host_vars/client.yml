@@ -1,1 +1,3 @@
-NEXT_PUBLIC_API_URL: "{{ frontend.NEXT_PUBLIC_API_URL }}"
+next_public_api_url: "{{ frontend.NEXT_PUBLIC_API_URL }}"
+
+splunk_hec_token: "{{ frontend.SPLUNK_HEC_TOKEN }}"

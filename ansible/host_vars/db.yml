@@ -1,0 +1,2 @@
+db_superuser_password: "{{ db.SUPERUSER_PASSWORD }}"
+splunk_hec_token: "{{ db.SPLUNK_HEC_TOKEN }}"

@@ -3,5 +3,8 @@
   vars_files:
     - ./group_vars/all.yml
     - ./host_vars/db.yml
+    - ./host_vars/db.yml
+    - ./group_vars/otel.yml
   roles:
+    - otel
     - db

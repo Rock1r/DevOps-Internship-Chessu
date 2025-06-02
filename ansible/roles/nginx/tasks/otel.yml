@@ -1,0 +1,28 @@
+- name: Install nginx_otel_module
+  ansible.builtin.get_url:
+    url: "https://github.com/open-telemetry/opentelemetry-cpp-contrib/releases/download/nginx%2Fv0.1.1/otel_ngx_module-debian-11-1.27.3.so"
+    dest: "{{ nginx_otel_module_path }}"
+    mode: '0644'
+  become: true
+
+- name: Create otel module config
+  ansible.builtin.template:
+    src: module_config.conf.j2
+    dest: "/etc/nginx/conf.d/otel_module.conf"
+  become: true
+
+- name: Create nginx otel module include file
+  ansible.builtin.copy:
+    dest: /etc/nginx/modules-available/otel.conf
+    content: "load_module {{ nginx_otel_module_path }};"
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Configure OpenTelemetry Collector
+  ansible.builtin.template:
+    src: nginx-otel-config.yaml.j2
+    dest: "{{ splunk_collector_config_path }}"
+  become: true
+  notify: Restart otel collector

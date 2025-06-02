@@ -1,13 +1,13 @@
 - name: Build server
   command: pnpm build:server
   args:
-    chdir: /home/{{ USERNAME }}/chessu/
+    chdir: /home/{{ username }}/chessu/
   become: true
 
-- name: Start or restart server with PM2
-  command: pm2 start --name server "pnpm start"
+- name: Start server with PM2
+  command: pm2 start --name server dist/server.js --node-args="--require ./instrumentation.js"
   args:
-    chdir: /home/{{ USERNAME }}/chessu/server
+    chdir: /home/{{ username }}/chessu/server
   become: true
 
 - name: Save PM2 process list

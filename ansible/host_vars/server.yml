@@ -1,3 +1,4 @@
-CORS_ORIGIN: "{{ backend.CORS_ORIGIN }}"
-PORT: "{{ backend.PORT }}"
-SESSION_SECRET: "{{ backend.SESSION_SECRET }}"
+cors_origin: "{{ backend.CORS_ORIGIN }}"
+port: "{{ backend.PORT }}"
+session_secret: "{{ backend.SESSION_SECRET }}"
+splunk_hec_token: "{{ backend.SPLUNK_HEC_TOKEN }}"

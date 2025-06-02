@@ -1,7 +1,7 @@
 - name: Create PostgreSQL user
   community.postgresql.postgresql_user:
-    name: "{{ PGUSER }}"
-    password: "{{ PGPASSWORD }}"
+    name: "{{ pguser }}"
+    password: "{{ pgpassword }}"
     encrypted: yes
     role_attr_flags: LOGIN
   become_user: postgres
@@ -13,13 +13,13 @@
     lc_collate: en_US.UTF-8
     lc_ctype: en_US.UTF-8
     template: template0
-    owner: "{{ PGUSER }}"
+    owner: "{{ pguser }}"
   become_user: postgres
 
 - name: Grant all privileges on database to user
   community.postgresql.postgresql_privs:
-    database: "{{ PGNAME }}"
-    role: "{{ PGUSER }}"
+    database: "{{ pgname }}"
+    role: "{{ pguser }}"
     privs: ALL
     type: database
   become_user: postgres

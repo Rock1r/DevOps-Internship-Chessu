@@ -1,0 +1,6 @@
+- name: Configure OpenTelemetry Collector
+  ansible.builtin.template:
+    src: postgresql-otel-config.yaml.j2
+    dest: "{{ splunk_collector_config_path }}"
+  become: true
+  notify: Restart otel collector
