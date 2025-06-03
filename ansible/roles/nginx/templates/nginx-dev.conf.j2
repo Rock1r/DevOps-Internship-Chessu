@@ -5,6 +5,12 @@ upstream backend {
     {% endfor %}
 }
 
+upstream client {
+    {% for host in groups['client'] %}
+    server {{ host }}:3000;
+    {% endfor %}
+}
+
 server {
     listen {{ nginx_port }};
     server_name {{ groups['nginx'][0] }};
@@ -21,15 +27,21 @@ server {
     }
 
     location / {
-        proxy_pass http://{{ groups['client'][0] }}:3000/;
-        include proxy_params;
+        proxy_pass http://client/;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Cookie $http_cookie;
     }
 
     location /v1/ {
         proxy_pass http://backend/v1/;
 
-        include proxy_params;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Cookie $http_cookie;
     }
 

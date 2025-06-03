@@ -1,8 +1,13 @@
+- name: Ensure required shared libraries for otel module are installed
+  ansible.builtin.apt:
+    name: libprotobuf23
+    state: present
+  become: true
+
 - name: Install nginx_otel_module
-  ansible.builtin.get_url:
-    url: "https://github.com/open-telemetry/opentelemetry-cpp-contrib/releases/download/nginx%2Fv0.1.1/otel_ngx_module-debian-11-1.27.3.so"
-    dest: "{{ nginx_otel_module_path }}"
-    mode: '0644'
+  ansible.builtin.apt:
+    name: nginx-module-otel
+    state: present
   become: true
 
 - name: Create otel module config
@@ -11,14 +16,14 @@
     dest: "/etc/nginx/conf.d/otel_module.conf"
   become: true
 
-- name: Create nginx otel module include file
-  ansible.builtin.copy:
-    dest: /etc/nginx/modules-available/otel.conf
-    content: "load_module {{ nginx_otel_module_path }};"
-    owner: root
-    group: root
-    mode: '0644'
+- name: Ensure OpenTelemetry module is loaded in nginx.conf
+  ansible.builtin.lineinfile:
+    path: /etc/nginx/nginx.conf
+    line: "load_module modules/ngx_otel_module.so;"
+    insertbefore: BOF
+    state: present
   become: true
+  notify: Restart nginx
 
 - name: Configure OpenTelemetry Collector
   ansible.builtin.template:

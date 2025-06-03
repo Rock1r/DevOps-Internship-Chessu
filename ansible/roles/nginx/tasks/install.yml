@@ -1,0 +1,31 @@
+- name: Install prerequisites for NGINX
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gnupg2
+      - ca-certificates
+      - lsb-release
+      - ubuntu-keyring
+    state: present
+    update_cache: true
+  become: true
+
+- name: Add NGINX signing key
+  ansible.builtin.apt_key:
+    url: https://nginx.org/keys/nginx_signing.key
+    state: present
+  become: true
+
+- name: Add NGINX repository
+  ansible.builtin.apt_repository:
+    repo: "deb http://nginx.org/packages/{{ ansible_distribution | lower }}/ {{ ansible_distribution_release | lower }} nginx"
+    state: present
+    filename: nginx
+  become: true
+
+- name: Install NGINX
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: true
+  become: true

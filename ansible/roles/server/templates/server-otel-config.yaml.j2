@@ -49,16 +49,19 @@ exporters:
     token: "{{splunk_hec_token}}"
     endpoint: "${SPLUNK_HEC_URL}"
     index: "server-metrics"
+    sourcetype: "server-metrics"
     profiling_data_enabled: false
   splunk_hec/traces:
     token: "{{splunk_hec_token}}"
     endpoint: "${SPLUNK_HEC_URL}"
     index: "server-traces"
+    sourcetype: "server-traces"
     profiling_data_enabled: false
   splunk_hec/logs:
     token: "{{splunk_hec_token}}"
     endpoint: "${SPLUNK_HEC_URL}"
     index: "server-logs"
+    sourcetype: "server-logs"
     profiling_data_enabled: false
 service:
   extensions: [health_check]

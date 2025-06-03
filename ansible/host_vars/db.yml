@@ -1,2 +1,5 @@
 db_superuser_password: "{{ db.SUPERUSER_PASSWORD }}"
 splunk_hec_token: "{{ db.SPLUNK_HEC_TOKEN }}"
+splunk_otel_password: "{{ db.SPLUNK_OTEL_PASSWORD }}"
+otel_username: "{{ db.OTEL_USERNAME }}"
+otel_password: "{{ db.OTEL_PASSWORD }}"

@@ -1,3 +1,21 @@
+- name: Create db user for OpenTelemetry
+  community.postgresql.postgresql_user:
+    name: "{{ otel_username }}"
+    password: "{{ otel_password }}"
+    encrypted: yes
+    role_attr_flags: LOGIN
+  become_user: postgres
+
+- name: Grant access to monitoring views
+  community.postgresql.postgresql_privs:
+    database: "{{ pgname}}"
+    roles: "{{ otel_username }}"
+    privs: SELECT
+    objs: pg_stat_database
+    type: table
+    schema: pg_catalog
+  become_user: postgres
+
 - name: Configure OpenTelemetry Collector
   ansible.builtin.template:
     src: postgresql-otel-config.yaml.j2
