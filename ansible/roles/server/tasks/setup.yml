@@ -5,7 +5,7 @@
   become: true
 
 - name: Start server with PM2
-  command: pm2 start --name server dist/server.js --node-args="--require ./instrumentation.js"
+  command: pm2 start --name server dist/server.js --node-args="--require ./instrumentation.js" --log-type json
   args:
     chdir: /home/{{ username }}/chessu/server
   become: true

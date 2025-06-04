@@ -5,6 +5,5 @@
     - ./group_vars/user.yml
     - ./group_vars/otel.yml
   roles:
-    - otel
     - common
     - client

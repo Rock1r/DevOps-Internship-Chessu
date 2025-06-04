@@ -7,5 +7,4 @@
     - ./group_vars/otel.yml
   roles:
     - common
-    - otel
     - server
