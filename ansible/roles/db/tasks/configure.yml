@@ -4,7 +4,7 @@
     contype: host
     users: all
     databases: all
-    address: "{{ SUBNET_ADDRESS }}"
+    address: "{{ subnet_address }}"
     method: md5
 
 - name: Ensure PostgreSQL is listening on all interfaces

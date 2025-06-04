@@ -1,0 +1,94 @@
+extensions:
+  host_observer:
+  health_check:
+    endpoint: "${SPLUNK_LISTEN_INTERFACE}:13133"
+receivers:
+  hostmetrics:
+    collection_interval: 10s
+    scrapers:
+      cpu:
+      disk:
+      filesystem:
+      memory:
+      network:
+      load:
+      paging:
+      processes:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "${SPLUNK_LISTEN_INTERFACE}:4317"
+      http:
+        endpoint: "${SPLUNK_LISTEN_INTERFACE}:4318"
+  filelog:
+    include:
+      - /root/.pm2/logs/*.log
+processors:
+  batch:
+    metadata_keys:
+      - X-SF-Token
+  memory_limiter:
+    check_interval: 2s
+    limit_mib: ${SPLUNK_MEMORY_LIMIT_MIB}
+  resourcedetection:
+    detectors: [gcp, ecs, ec2, azure, system]
+    override: true
+  resource/add_mode:
+    attributes:
+      - action: insert
+        value: "agent"
+        key: otelcol.service.mode
+  resource/add_source:
+    attributes:
+      - action: insert
+        key: source
+        from_attribute: host.name
+exporters:
+  splunk_hec/metrics:
+    token: "{{splunk_hec_token}}"
+    endpoint: "${SPLUNK_HEC_URL}"
+    index: "client-metrics"
+    sourcetype: "client-metrics"
+    profiling_data_enabled: false
+  splunk_hec/traces:
+    token: "{{splunk_hec_token}}"
+    endpoint: "${SPLUNK_HEC_URL}"
+    index: "client-traces"
+    sourcetype: "client-traces"
+    profiling_data_enabled: false
+  splunk_hec/logs:
+    token: "{{splunk_hec_token}}"
+    endpoint: "${SPLUNK_HEC_URL}"
+    index: "client-logs"
+    sourcetype: "client-logs"
+    profiling_data_enabled: false
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors:
+      - memory_limiter
+      - batch
+      - resourcedetection
+      - resource/add_mode
+      - resource/add_source
+      exporters: [splunk_hec/traces]
+    metrics:
+      receivers: [hostmetrics, otlp]
+      processors:
+      - memory_limiter
+      - batch
+      - resourcedetection
+      - resource/add_mode
+      - resource/add_source
+      exporters: [splunk_hec/metrics]
+    logs:
+      receivers: [otlp, filelog]
+      processors:
+      - memory_limiter
+      - batch
+      - resourcedetection
+      - resource/add_mode
+      - resource/add_source
+      exporters: [splunk_hec/logs]

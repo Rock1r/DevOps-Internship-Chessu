@@ -1,1 +1,2 @@
 nginx_port: "{{ nginx.PORT }}"
+splunk_hec_token: "{{ nginx.SPLUNK_HEC_TOKEN }}"

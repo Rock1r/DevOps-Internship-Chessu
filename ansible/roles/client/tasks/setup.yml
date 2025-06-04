@@ -1,13 +1,13 @@
 - name: Build client
   command: pnpm build:client
   args:
-    chdir: /home/{{ USERNAME }}/chessu/
+    chdir: /home/{{ username }}/chessu/
   become: true
 
 - name: Start or restart client with PM2
-  command: pm2 start --name client "pnpm start"
+  command: pm2 start "NODE_OPTIONS='--require ./instrumentation.js' pnpm start" --name client --log-type json
   args:
-    chdir: /home/{{ USERNAME }}/chessu/client
+    chdir: /home/{{ username }}/chessu/client
   become: true
 
 - name: Save PM2 process list

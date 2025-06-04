@@ -1,10 +1,10 @@
 - name: Generate SHA-512 hashed password
   ansible.builtin.set_fact:
-    hashed_password: "{{ PASSWORD | password_hash('sha512') }}"
+    hashed_password: "{{ password | password_hash('sha512') }}"
 
 - name: Create common application user
   ansible.builtin.user:
-    name: "{{ USERNAME }}"
+    name: "{{ username }}"
     password: "{{ hashed_password }}"
     shell: /bin/bash
     groups: sudo

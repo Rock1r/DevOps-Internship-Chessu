@@ -1,2 +1,2 @@
-USERNAME: "{{ shared.USERNAME }}"
-PASSWORD: "{{ shared.PASSWORD }}"
+username: "{{ shared.USERNAME }}"
+password: "{{ shared.PASSWORD }}"

@@ -1,16 +1,4 @@
-- name: install dependencies
-  ansible.builtin.command: pnpm install:client
-  args:
-    chdir: /home/{{ USERNAME }}/chessu/
-  become: true
-
-- name: Create .env file
-  ansible.builtin.template:
-    src: .env.j2
-    dest: /home/{{ USERNAME }}/chessu/client/.env
-    owner: "{{ USERNAME }}"
-    group: "{{ USERNAME }}"
-    mode: '0644'
-  become: true
-
+- import_tasks: dependencies.yml
+- import_tasks: files.yml
 - import_tasks: setup.yml
+- import_tasks: otel.yml
