@@ -64,12 +64,6 @@ pipeline {
             }
         }
 
-        stage('Format') {
-            steps {
-                sh 'pnpm format'
-            }
-        }
-
         stage('Test') {
             parallel {
                 stage('Frontend Test') {
