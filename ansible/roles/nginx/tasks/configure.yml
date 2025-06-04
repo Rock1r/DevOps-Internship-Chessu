@@ -1,0 +1,8 @@
+- name: Upload NGINX config
+  ansible.builtin.template:
+    src: nginx-dev.conf.j2
+    dest: /etc/nginx/conf.d/chessu.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart nginx

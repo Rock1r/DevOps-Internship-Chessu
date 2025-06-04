@@ -1,4 +1,4 @@
 - import_tasks: dependencies.yml
 - import_tasks: files.yml
 - import_tasks: setup.yml
-- include_tasks: otel.yml
+- import_tasks: otel.yml

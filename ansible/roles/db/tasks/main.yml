@@ -1,7 +1,7 @@
 - import_tasks: install.yml
 - import_tasks: configure.yml
 - import_tasks: setup.yml
-- include_tasks: otel.yml
+- import_tasks: otel.yml
 
 - name: Set password for postgres superuser
   community.postgresql.postgresql_user:
