@@ -97,23 +97,11 @@ pipeline {
             }
         }
 
-        stage('Archive Frontend') {
-            steps {
-                archiveArtifacts artifacts: 'client/.next/**', fingerprint: true
-            }
-        }
-
         stage('Build Backend') {
             steps {
                 dir('server') {
                     sh 'pnpm build'
                 }
-            }
-        }
-
-        stage('Archive Backend') {
-            steps {
-                archiveArtifacts artifacts: 'server/dist/**', fingerprint: true
             }
         }
     }
