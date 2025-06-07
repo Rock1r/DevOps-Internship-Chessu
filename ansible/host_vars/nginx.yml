@@ -1,2 +1,5 @@
 nginx_port: "{{ nginx.PORT }}"
 splunk_hec_token: "{{ nginx.SPLUNK_HEC_TOKEN }}"
+splunk_nginx_metrics_index: "{{ nginx.SPLUNK_NGINX_METRICS_INDEX }}"
+splunk_nginx_traces_index: "{{ nginx.SPLUNK_NGINX_TRACES_INDEX }}"
+splunk_nginx_logs_index: "{{ nginx.SPLUNK_NGINX_LOGS_INDEX }}"

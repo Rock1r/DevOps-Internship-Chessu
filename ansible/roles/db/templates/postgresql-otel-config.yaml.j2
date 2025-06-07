@@ -60,19 +60,19 @@ exporters:
   splunk_hec/metrics:
     token: "{{splunk_hec_token}}"
     endpoint: "${SPLUNK_HEC_URL}"
-    index: "db-metrics"
+    index: "{{splunk_db_metrics_index}}"
     sourcetype: "db-metrics"
     profiling_data_enabled: false
   splunk_hec/traces:
     token: "{{splunk_hec_token}}"
     endpoint: "${SPLUNK_HEC_URL}"
-    index: "db-traces"
+    index: "{{splunk_db_traces_index}}"
     sourcetype: "db-traces"
     profiling_data_enabled: false
   splunk_hec/logs:
     token: "{{splunk_hec_token}}"
     endpoint: "${SPLUNK_HEC_URL}"
-    index: "db-logs"
+    index: "{{splunk_db_logs_index}}"
     sourcetype: "db-logs"
     profiling_data_enabled: false
 service:

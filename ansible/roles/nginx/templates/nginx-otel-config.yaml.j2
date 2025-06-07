@@ -50,19 +50,19 @@ exporters:
   splunk_hec/metrics:
     token: "{{splunk_hec_token}}"
     endpoint: "${SPLUNK_HEC_URL}"
-    index: "nginx-metrics"
+    index: "{{splunk_nginx_metrics_index}}"
     sourcetype: "nginx-metrics"
     profiling_data_enabled: false
   splunk_hec/traces:
     token: "{{splunk_hec_token}}"
     endpoint: "${SPLUNK_HEC_URL}"
-    index: "nginx-traces"
+    index: "{{splunk_nginx_traces_index}}"
     sourcetype: "nginx-traces"
     profiling_data_enabled: false
   splunk_hec/logs:
     token: "{{splunk_hec_token}}"
     endpoint: "${SPLUNK_HEC_URL}"
-    index: "nginx-logs"
+    index: "{{splunk_nginx_logs_index}}"
     sourcetype: "nginx-logs"
     profiling_data_enabled: false
 service:
