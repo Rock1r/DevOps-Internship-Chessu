@@ -5,11 +5,10 @@
     "plugin:@typescript-eslint/stylistic",
     "prettier"
   ],
-    "plugins": ["jest"],
   "env": {
     "jest": true
   },
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "jest"],
   "root": true
 }
