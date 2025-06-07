@@ -57,8 +57,7 @@ pipeline {
 
         stage('Lint') {
             steps {
-                dir('client') {
-                    sh 'pnpm add -D eslint-plugin-jest'
+                dir('chessu') {
                     sh 'pnpm lint'
                 }
             }
@@ -82,19 +81,21 @@ pipeline {
                 }
             }
         }
-
-        stage('Build Frontend') {
-            steps {
-                dir('client') {
-                    sh 'pnpm build'
+        stage('Build') {
+            parallel {
+                stage('Frontend Build') {
+                    steps {
+                        dir('client') {
+                            sh 'pnpm build'
+                        }
+                    }
                 }
-            }
-        }
-
-        stage('Build Backend') {
-            steps {
-                dir('server') {
-                    sh 'pnpm build'
+                stage('Backend Build') {
+                    steps {
+                        dir('server') {
+                            sh 'pnpm build'
+                        }
+                    }
                 }
             }
         }
