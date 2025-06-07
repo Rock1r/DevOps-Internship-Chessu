@@ -1,0 +1,4 @@
+splunk_collector_config_path: "{{ splunk.SPLUNK_COLLECTOR_CONFIG_PATH | default('/etc/otel/collector/agent_config.yaml') }}"
+splunk_hec_url: "{{ splunk.SPLUNK_HEC_URL }}"
+splunk_memory_limit_mib: "{{ splunk.SPLUNK_MEMORY_LIMIT_MIB | default('1024') }}"
+splunk_listen_interface: "{{ splunk.SPLUNK_LISTEN_INTERFACE | default('127.0.0.1') }}"

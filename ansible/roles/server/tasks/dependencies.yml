@@ -1,0 +1,18 @@
+- name: install dependencies
+  ansible.builtin.command: pnpm install:server
+  args:
+    chdir: /home/{{ username }}/chessu/
+  become: true
+
+- name: Install dependencies for autoinstrumentation
+  ansible.builtin.command: >
+    pnpm install --save
+    @opentelemetry/auto-instrumentations-node
+    @opentelemetry/sdk-node
+    @opentelemetry/exporter-trace-otlp-proto
+    @opentelemetry/exporter-metrics-otlp-proto
+    @opentelemetry/sdk-metrics
+  args:
+    chdir: /home/{{ username }}/chessu/server
+  become: true
+  

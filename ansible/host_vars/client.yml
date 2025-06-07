@@ -1,1 +1,7 @@
-NEXT_PUBLIC_API_URL: "{{ frontend.NEXT_PUBLIC_API_URL }}"
+next_public_api_url: "{{ frontend.NEXT_PUBLIC_API_URL }}"
+
+splunk_hec_token: "{{ frontend.SPLUNK_HEC_TOKEN }}"
+
+splunk_client_metrics_index: "{{ frontend.SPLUNK_CLIENT_METRICS_INDEX }}"
+splunk_client_traces_index: "{{ frontend.SPLUNK_CLIENT_TRACES_INDEX }}"
+splunk_client_logs_index: "{{ frontend.SPLUNK_CLIENT_LOGS_INDEX }}"

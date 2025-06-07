@@ -2,8 +2,8 @@
   become: yes
   vars_files:
     - ./host_vars/client.yml
-    - ./host_vars/nginx.yml
     - ./group_vars/user.yml
+    - ./group_vars/otel.yml
   roles:
     - common
     - client
