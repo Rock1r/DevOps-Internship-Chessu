@@ -1,0 +1,8 @@
+- name: Clone repository from GitHub
+  ansible.builtin.git:
+    repo: "https://github.com/Rock1r/DevOps-Internship-Chessu.git"
+    dest: "/home/{{ USERNAME }}/chessu"
+    version: "main"
+    force: true
+    update: true
+  become: true
