@@ -1,0 +1,12 @@
+- name: Restart nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+    enabled: yes
+  become: true
+
+- name: Restart otel collector
+  ansible.builtin.systemd:
+    name: splunk-otel-collector
+    state: restarted
+  become: true
