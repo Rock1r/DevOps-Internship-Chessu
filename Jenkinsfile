@@ -9,27 +9,7 @@ pipeline {
         pollSCM('H/5 * * * *')
     }
     
-    environment {
-        NODE_ENV = 'test'
-    }
-
     stages {
-        stage('Set Env') {
-            steps {
-                script {
-                    if (env.BRANCH_NAME == 'main') {
-                        env.NODE_ENV = 'production'
-                    } else if (env.BRANCH_NAME == 'dev') {
-                        env.NODE_ENV = 'staging'
-                    } else {
-                        env.NODE_ENV = 'test'
-                    }
-
-                    echo "Environment set to ${env.NODE_ENV}"
-                }
-            }
-        }
-
         stage('Checkout') {
             steps {
                 checkout scm
