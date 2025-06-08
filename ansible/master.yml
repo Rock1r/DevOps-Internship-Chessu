@@ -1,1 +1,5 @@
+- import_playbook: otel.yml
+- import_playbook: db.yml
+- import_playbook: server.yml
+- import_playbook: client.yml
 - import_playbook: nginx.yml
