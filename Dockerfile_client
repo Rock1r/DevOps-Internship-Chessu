@@ -1,0 +1,27 @@
+# ---------- BUILD STAGE ----------
+FROM node:lts-alpine3.20 AS builder
+
+WORKDIR /chessu
+ENV PNPM_HOME=/usr/local/bin
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+COPY . .
+
+RUN apk add --no-cache libc6-compat && \
+    corepack enable && corepack prepare pnpm@latest --activate && \
+    pnpm install --frozen-lockfile && \
+    pnpm --filter client build
+
+# ---------- RUN STAGE ----------
+FROM node:lts-alpine3.20 AS runner
+
+WORKDIR /chessu
+
+COPY --from=builder /chessu/client/.next/standalone ./
+COPY --from=builder /chessu/client/.next/static ./client/.next/static
+COPY --from=builder /chessu/client/public ./client/public
+
+EXPOSE 3000
+ENV NODE_ENV=production
+CMD ["node", "client/server.js"]

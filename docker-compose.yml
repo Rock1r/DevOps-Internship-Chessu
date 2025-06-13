@@ -1,33 +1,53 @@
-version: '3.8'
 
 services:
-  chessu:
-    image: chessu:latest # Replace with the correct image if needed
-    container_name: chessu_container
-    environment:
-      POSTGRES_DB: chessu
-      POSTGRES_USER: exampleuser
-      POSTGRES_PASSWORD: examplepassword
-      DATABASE_URL: postgres://chessu_user:chessu_pass@db:5432/chessu
-    ports:
-      - "3000:3000"
-      - "3001:3001"
-    depends_on:
-      - db
+  chessu_client:
+    build:
+      context: .
+      dockerfile: Dockerfile_client
+      args:
+        - NEXT_PUBLIC_API_URL=http://192.168.0.222
+    container_name: chessu_client
+    expose:
+      - "3000"
     networks:
       - chessu_network
-
+  chessu_server:
+    build:
+      context: .
+      dockerfile: Dockerfile_server
+    container_name: chessu_server
+    expose:
+      - "3001"
+    depends_on:
+      - db
+    environment:
+      - CORS_ORIGIN=http://192.168.0.222
+    env_file: 
+      - ./docker/env/server.env
+    networks:
+      - chessu_network
   db:
     image: postgres:15
-    container_name: postgres_container
-    environment:
-      POSTGRES_DB: chessu
-      POSTGRES_USER: exampleuser
-      POSTGRES_PASSWORD: examplepassword
+    container_name: db
+    env_file: ./docker/env/db.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - chessu_network
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    depends_on:
+      - chessu_server
+      - chessu_client
+    expose:
+      - "80"
+    volumes:
+      - ./docker/nginx_chessu.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "80:80"
+    networks:
+      chessu_network:
 
 volumes:
   postgres_data:

@@ -1,0 +1,22 @@
+FROM node:lts-alpine3.20
+
+ENV PNPM_HOME=/usr/local/bin
+
+WORKDIR /opt/chessu/
+
+COPY \
+  pnpm-workspace.yaml \
+  pnpm-lock.yaml \
+  server/package.json \
+  types/ \
+  ./
+
+COPY ./server/ ./server/
+
+RUN apk update && \
+    corepack enable && corepack prepare pnpm@latest --activate && \
+    pnpm config set store-dir /opt/chessu/.pnpm-store && \
+    pnpm install --filter server --unsafe-perm && \
+    pnpm --filter server build
+
+CMD ["pnpm", "--filter", "server", "start"]
