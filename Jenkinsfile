@@ -8,7 +8,11 @@ pipeline {
     triggers {
         pollSCM('H/5 * * * *')
     }
-    
+
+    environment {
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
+    }
+
     stages {
 
         stage('Install Deps') {
@@ -56,19 +60,20 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
+
+        stage('Docker Build') {
             parallel {
-                stage('Frontend Build') {
+                stage('Build Client Image') {
                     steps {
-                        dir('client') {
-                            sh 'pnpm build'
+                        script {
+                            def client = docker.build("client:${IMAGE_TAG}", "-f Dockerfile_client .")
                         }
                     }
                 }
-                stage('Backend Build') {
+                stage('Build Server Image') {
                     steps {
-                        dir('server') {
-                            sh 'pnpm build'
+                        script {
+                            def server = docker.build("server:${IMAGE_TAG}", "-f Dockerfile_server .")
                         }
                     }
                 }

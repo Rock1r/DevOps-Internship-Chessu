@@ -1,10 +1,23 @@
-default: run
+COMPOSE_FILE := docker-compose.yml
 
-build-run: 
-	docker compose up -d --build
+default: build up
 
-run: 
-	docker compose up -d 
-	
+build:
+	docker-compose -f $(COMPOSE_FILE) build $(c)
+up:
+	docker-compose -f $(COMPOSE_FILE) up -d $(c)
+start:
+	docker-compose -f $(COMPOSE_FILE) start $(c)
+down:
+	docker-compose -f $(COMPOSE_FILE) down $(c)
+destroy:
+	docker-compose -f $(COMPOSE_FILE) down -v $(c)
 stop:
-	docker compose down
+	docker-compose -f $(COMPOSE_FILE) stop $(c)
+restart:
+	docker-compose -f $(COMPOSE_FILE) stop $(c)
+	docker-compose -f $(COMPOSE_FILE) up -d $(c)
+logs:
+	docker-compose -f $(COMPOSE_FILE) logs --tail=100 -f $(c)
+ps:
+	docker-compose -f $(COMPOSE_FILE) ps
