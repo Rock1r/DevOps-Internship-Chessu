@@ -82,15 +82,25 @@ pipeline {
                 stage('Build Client Image') {
                     steps {
                         script {
-                            def client = docker.build("chessu/client:${IMAGE_TAG}", "-t chessu/client:latest -f Dockerfile_client --build-arg ${env.NGINX_URL} .")
+                            client = docker.build("chessu/client:${IMAGE_TAG}", "-t chessu/client:latest -f Dockerfile_client --build-arg ${env.NGINX_URL} .")
                         }
                     }
                 }
                 stage('Build Server Image') {
                     steps {
                         script {
-                            def server = docker.build("chessu/server:${IMAGE_TAG}", "-t chessu/server:latest -f Dockerfile_server .")
+                            server = docker.build("chessu/server:${IMAGE_TAG}", "-t chessu/server:latest -f Dockerfile_server .")
                         }
+                    }
+                }
+            }
+        }
+        stage('Push images to AWS ECR'){
+            steps{
+                script{
+                    docker.withRegistry("https://${env.ECR_URI}", "ecr:${env.ECR_REGION}:aws-jenkins"){
+                        client.push()
+                        server.push()
                     }
                 }
             }
