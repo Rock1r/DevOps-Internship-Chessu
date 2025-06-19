@@ -1,11 +1,11 @@
 # ---------- BUILD STAGE ----------
 FROM node:lts-alpine3.20 AS builder
 
-WORKDIR /chessu
-ENV PNPM_HOME=/usr/local/bin
 ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV PNPM_HOME=/usr/local/bin \
+    NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
+WORKDIR /chessu
 COPY . .
 
 RUN apk add --no-cache libc6-compat && \
@@ -16,6 +16,7 @@ RUN apk add --no-cache libc6-compat && \
 # ---------- RUN STAGE ----------
 FROM node:lts-alpine3.20 AS runner
 
+ENV NODE_ENV=production
 WORKDIR /chessu
 
 COPY --from=builder /chessu/client/.next/standalone ./
@@ -23,5 +24,4 @@ COPY --from=builder /chessu/client/.next/static ./client/.next/static
 COPY --from=builder /chessu/client/public ./client/public
 
 EXPOSE 3000
-ENV NODE_ENV=production
 CMD ["node", "client/server.js"]
