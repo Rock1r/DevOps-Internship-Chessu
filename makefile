@@ -8,6 +8,7 @@ up:
 	docker-compose -f $(COMPOSE_FILE) up -d $(c)
 up-scale:
 	docker-compose -f $(COMPOSE_FILE) up -d \
+		--scale chessu_client=$(clients) \
 		--scale chessu_server=$(servers)
 start:
 	docker-compose -f $(COMPOSE_FILE) start $(c)
