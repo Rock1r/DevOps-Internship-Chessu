@@ -41,6 +41,8 @@ services:
   nginx:
     image: nginx:alpine
     container_name: nginx
+    expose:
+      - "10080"
     ports:
       - "80:80"
     depends_on:
@@ -60,9 +62,39 @@ services:
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./docker/nginx/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
-
+    networks:
+      - chessu_network
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otel-collector
+    user: "0"
+    env_file:
+      - ./docker/env/otelcol.env
+    volumes:
+      - ./docker/otel/otel-config.yml:/etc/otel/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["--config", "/etc/otel/config.yml"]
+    networks:
+      - chessu_network
+  splunk:
+    image: splunk/splunk:latest
+    container_name: splunk
+    env_file:
+      - ./docker/env/splunk.env
+    expose:
+      - 8088
+    ports:
+      - "8000:8000"
+    volumes:
+      - splunk_var:/opt/splunk/var
+      - splunk_etc:/opt/splunk/etc
+    networks:
+      - chessu_network
+      
 volumes:
   postgres_data:
+  splunk_var:
+  splunk_etc:
 
 networks:
   chessu_network:

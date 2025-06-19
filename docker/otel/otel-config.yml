@@ -1,0 +1,82 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+  docker_stats:
+    endpoint: unix:///var/run/docker.sock
+    collection_interval: 30s
+    timeout: 10s
+    metrics:
+      container.uptime:
+        enabled: true
+      container.restarts:
+        enabled: true
+      container.network.io.usage.rx_errors:
+        enabled: true
+      container.network.io.usage.tx_errors:
+        enabled: true
+      container.network.io.usage.rx_packets:
+        enabled: true
+      container.network.io.usage.tx_packets:
+        enabled: true
+  postgresql:
+    endpoint: db:5432
+    username: chessu
+    password: chessu
+    databases:
+      - chessu
+    collection_interval: 10s
+    tls:
+      insecure: true
+      insecure_skip_verify:
+        true  
+  nginx:
+    endpoint: "http://nginx:10080/status"
+    collection_interval: 10s
+processors:
+  batch:
+    send_batch_size: 1000
+    timeout: 10s
+  resourcedetection/env:
+    detectors: [env]
+    timeout: 2s
+    override: false
+  resourcedetection/system:
+    detectors: ["system"]
+    system:
+      hostname_sources: ["dns", "os"]
+  resourcedetection/docker:
+    detectors: [env, docker]
+    timeout: 2s
+    override: false
+exporters:
+  splunk_hec/logs:
+    token: "${LOGS_TOKEN}"
+    endpoint: "http://splunk:8088"
+    sourcetype: "chessu-logs"
+  splunk_hec/metrics:
+    token: "${METRICS_TOKEN}"
+    endpoint: "http://splunk:8088"
+    sourcetype: "chessu-metrics"
+  splunk_hec/traces:
+    token: "${TRACES_TOKEN}"
+    endpoint: "http://splunk:8088"
+    sourcetype: "chessu-traces"
+
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp, docker_stats, postgresql, nginx]
+      processors: [resourcedetection/env, resourcedetection/system, resourcedetection/docker, batch]
+      exporters: [splunk_hec/metrics]
+
+    traces:
+      receivers: [otlp]
+      processors: [resourcedetection/env, resourcedetection/system, resourcedetection/docker, batch]
+      exporters: [splunk_hec/traces]
+
+    logs:
+      receivers: [otlp]
+      processors: [resourcedetection/env, resourcedetection/system, resourcedetection/docker, batch]
+      exporters: [splunk_hec/logs]

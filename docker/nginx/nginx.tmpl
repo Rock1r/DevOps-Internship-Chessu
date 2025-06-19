@@ -44,10 +44,14 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
+}
+
+server {
+    listen 10080;
 
     location /status {
         stub_status on;
-        allow 127.0.0.1;
-        deny all;
+        access_log off;
+        allow all;
     }
 }
