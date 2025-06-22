@@ -13,15 +13,39 @@ RUN apk add --no-cache libc6-compat && \
     pnpm install --frozen-lockfile && \
     pnpm --filter client build
 
+# ---------- OTEL DEPENDENCIES STAGE ----------
+FROM node:lts-alpine3.20 AS otel-deps
+
+ENV PNPM_HOME=/usr/local/bin
+
+WORKDIR /otel
+COPY client/package.json types ./ 
+
+RUN corepack enable && corepack prepare pnpm@latest --activate && \
+    pnpm install \
+      @opentelemetry/sdk-node \
+      @opentelemetry/auto-instrumentations-node \
+      @opentelemetry/exporter-trace-otlp-grpc \
+      @opentelemetry/exporter-metrics-otlp-grpc \
+      @opentelemetry/sdk-metrics \
+      @opentelemetry/resources \
+      @opentelemetry/instrumentation-fs
+
 # ---------- RUN STAGE ----------
 FROM node:lts-alpine3.20 AS runner
 
 ENV NODE_ENV=production
 WORKDIR /chessu
 
-COPY --from=builder /chessu/client/.next/standalone ./
+COPY --from=builder /chessu/client/.next/standalone ./ 
+COPY --from=builder /chessu/client/instrumentation.js ./client/instrumentation.js
 COPY --from=builder /chessu/client/.next/static ./client/.next/static
 COPY --from=builder /chessu/client/public ./client/public
+
+COPY --from=otel-deps /otel/node_modules ./client/node_modules
+COPY --from=otel-deps /otel/pnpm-lock.yaml ./client/
+
+ENV NODE_OPTIONS="--require /chessu/client/instrumentation.js"
 
 EXPOSE 3000
 CMD ["node", "client/server.js"]

@@ -1,6 +1,7 @@
 FROM node:lts-alpine3.20
 
-ENV PNPM_HOME=/usr/local/bin
+ENV PNPM_HOME=/usr/local/bin \
+    NODE_ENV=production
 
 WORKDIR /opt/chessu/
 
@@ -12,11 +13,18 @@ COPY \
   ./
 
 COPY ./server/ ./server/
+COPY server/instrumentation.js ./server/instrumentation.js
 
 RUN apk update && \
     corepack enable && corepack prepare pnpm@latest --activate && \
     pnpm config set store-dir /opt/chessu/.pnpm-store && \
     pnpm install --filter server --unsafe-perm && \
+    pnpm add --filter server  @opentelemetry/auto-instrumentations-node \
+    @opentelemetry/sdk-node \
+    @opentelemetry/exporter-trace-otlp-proto \
+    @opentelemetry/exporter-metrics-otlp-proto \
+    @opentelemetry/instrumentation \
+    @opentelemetry/sdk-metrics && \
     pnpm --filter server build
-
+ENV NODE_OPTIONS="--require /opt/chessu/server/instrumentation.js"
 CMD ["pnpm", "--filter", "server", "start"]
