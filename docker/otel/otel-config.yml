@@ -55,21 +55,24 @@ processors:
 exporters:
   splunk_hec/logs:
     token: "${LOGS_TOKEN}"
-    endpoint: "http://splunk:8088"
+    endpoint: "https://splunk:8088"
     sourcetype: "chessu-logs"
+    tls:
+      insecure_skip_verify: true
   splunk_hec/metrics:
     token: "${METRICS_TOKEN}"
-    endpoint: "http://splunk:8088"
+    endpoint: "https://splunk:8088"
     sourcetype: "chessu-metrics"
+    tls:
+      insecure_skip_verify: true
   splunk_hec/traces:
     token: "${TRACES_TOKEN}"
-    endpoint: "http://splunk:8088"
+    endpoint: "https://splunk:8088"
     sourcetype: "chessu-traces"
+    tls:
+      insecure_skip_verify: true
 
 service:
-  telemetry:  
-    logs:
-      level: debug
   pipelines:
     metrics:
       receivers: [otlp, docker_stats, postgresql, nginx]
