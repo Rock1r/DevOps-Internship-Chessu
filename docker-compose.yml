@@ -114,9 +114,10 @@ services:
     container_name: splunk
     env_file:
       - ./docker/env/splunk.env
+    expose:
+      - 8088
     ports:
       - "8000:8000"
-      - "8088:8088"
     volumes:
       - splunk_var:/opt/splunk/var
       - splunk_etc:/opt/splunk/etc

@@ -1,7 +1,7 @@
 COMPOSE_FILE := docker-compose.yml
 
 default: build up
-
+c := $(word 2, $(MAKECMDGOALS))
 build:
 	docker-compose -f $(COMPOSE_FILE) build $(c)
 up:
@@ -25,3 +25,6 @@ logs:
 	docker-compose -f $(COMPOSE_FILE) logs --tail=100 -f $(c)
 ps:
 	docker-compose -f $(COMPOSE_FILE) ps
+
+%:
+	@:
