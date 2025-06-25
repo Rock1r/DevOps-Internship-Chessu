@@ -13,9 +13,12 @@ services:
       - nginx.port=3000
     environment:
         - OTEL_EXPORTER_OTLP_ENDPOINT=grpc://otel-collector:4317
-        - OTEL_SERVICE_NAME=client
     networks:
       - chessu_network
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}/{{.ID}}"
   chessu_server:
     build:
       context: .
@@ -27,7 +30,7 @@ services:
     environment:
       - CORS_ORIGIN=http://192.168.0.222
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
-      - OTEL_SERVICE_NAME=server
+      - OTEL_SERVICE_NAME=chessu
     labels:
       - nginx.group=server
       - nginx.port=3001
@@ -35,14 +38,23 @@ services:
       - ./docker/env/server.env
     networks:
       - chessu_network
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}/{{.ID}}"
   db:
     image: postgres:15
     container_name: db
-    env_file: ./docker/env/db.env
     volumes:
+      - ./docker/db:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
+    env_file: ./docker/env/db.env
     networks:
       - chessu_network
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}/{{.ID}}"
   nginx:
     image: nginx:alpine-otel
     container_name: nginx
@@ -61,6 +73,10 @@ services:
       - ./docker/nginx/opentelemetry_module.conf:/etc/nginx/conf.d/opentelemetry_module.conf
     networks:
       - chessu_network
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}/{{.ID}}"
   docker-gen:
     image: nginxproxy/docker-gen
     container_name: nginx-proxy-gen
@@ -83,18 +99,24 @@ services:
     volumes:
       - ./docker/otel/otel-config.yml:/etc/otel/config.yml:ro
       - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers
     command: ["--config", "/etc/otel/config.yml"]
     networks:
       - chessu_network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        tag: "{{.Name}}/{{.ID}}"
   splunk:
     image: splunk/splunk:latest
     container_name: splunk
     env_file:
       - ./docker/env/splunk.env
-    expose:
-      - 8088
     ports:
       - "8000:8000"
+      - "8088:8088"
     volumes:
       - splunk_var:/opt/splunk/var
       - splunk_etc:/opt/splunk/etc

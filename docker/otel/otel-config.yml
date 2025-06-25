@@ -1,3 +1,7 @@
+extensions:
+  docker_observer:
+    endpoint: unix:///var/run/docker.sock
+
 receivers:
   otlp:
     protocols:
@@ -9,6 +13,8 @@ receivers:
     endpoint: unix:///var/run/docker.sock
     collection_interval: 30s
     timeout: 10s
+    excluded_images:
+      - "nginxproxy/docker-gen"
     metrics:
       container.uptime:
         enabled: true
@@ -22,20 +28,45 @@ receivers:
         enabled: true
       container.network.io.usage.tx_packets:
         enabled: true
-  postgresql:
-    endpoint: db:5432
-    username: chessu
-    password: chessu
-    databases:
-      - chessu
-    collection_interval: 10s
-    tls:
-      insecure: true
-      insecure_skip_verify:
-        true  
-  nginx:
-    endpoint: "http://nginx:10080/status"
-    collection_interval: 10s
+  filelog:
+    include:
+      - /var/lib/docker/containers/*/*.log
+    include_file_name: false
+    include_file_path: true
+    operators:
+    - type: json_parser
+      if: body matches "^{.*}$"
+      parse_to: attributes
+      output: parse_container_name
+    - id: recombine
+      type: recombine
+      combine_field: body
+      is_first_entry: body matches "^\\d{4}-\\d{2}-\\d{2}T\\d{2}"
+    - type: regex_parser
+      id: parse_container_name
+      regex: '(?P<container_name>.+)'
+      parse_from: attributes.attrs.tag
+
+  receiver_creator:
+    watch_observers: [docker_observer]
+    receivers:
+      nginx:
+        rule: type == "container" && name contains "nginx"
+        config:
+          endpoint: "http://nginx:10080/status"
+          collection_interval: 10s
+      postgresql:
+        rule: type == "container" && name contains "db"
+        config:
+          endpoint: db:5432
+          username: ${OTEL_USER}
+          password: ${OTEL_PASS}
+          databases:
+            - chessu
+          collection_interval: 10s
+          tls:
+            insecure: true
+            insecure_skip_verify: true
 processors:
   batch:
     send_batch_size: 1000
@@ -73,18 +104,19 @@ exporters:
       insecure_skip_verify: true
 
 service:
+  extensions: [docker_observer]
   pipelines:
     metrics:
-      receivers: [otlp, docker_stats, postgresql, nginx]
+      receivers: [otlp, docker_stats, receiver_creator]
       processors: [resourcedetection/env, resourcedetection/system, resourcedetection/docker, batch]
       exporters: [splunk_hec/metrics]
 
     traces:
-      receivers: [otlp]
+      receivers: [otlp, receiver_creator]
       processors: [resourcedetection/env, resourcedetection/system, resourcedetection/docker, batch]
       exporters: [splunk_hec/traces]
 
     logs:
-      receivers: [otlp]
+      receivers: [otlp, filelog]
       processors: [resourcedetection/env, resourcedetection/system, resourcedetection/docker, batch]
       exporters: [splunk_hec/logs]
