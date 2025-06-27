@@ -123,12 +123,22 @@ services:
       - splunk_etc:/opt/splunk/etc
     networks:
       - chessu_network
-      
+  sonar:
+    image: sonarqube:community
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_logs:/opt/sonarqube/logs
+      - sonar_plugins:/opt/sonarqube/extensions
 volumes:
   postgres_data:
   splunk_var:
   splunk_etc:
-
+  sonar_data:
+  sonar_logs:
+  sonar_plugins:
 networks:
   chessu_network:
     driver: bridge
