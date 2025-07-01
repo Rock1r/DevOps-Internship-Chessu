@@ -91,10 +91,11 @@ pipeline {
             snykSecurity(
               snykInstallation: 'snyk',
               snykTokenId: 'snyk_token',
+              additionalArguments: '--all-projects'
             )
           }
         }
-        
+
         stage('Init Tag Info') {
             steps {
                 script {
