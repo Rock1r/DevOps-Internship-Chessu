@@ -132,6 +132,19 @@ services:
       - sonar_data:/opt/sonarqube/data
       - sonar_logs:/opt/sonarqube/logs
       - sonar_plugins:/opt/sonarqube/extensions
+    networks:
+      - chessu_network
+  zap:
+    image: zaproxy/zap-stable
+    container_name: zap
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./docker/zap/zap.yaml:/zap/wrk/zap.yaml
+      - ./docker/zap/zap-report/:/tmp/zap/
+    command: zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true -autorun /zap/wrk/zap.yaml
+    networks:
+      - chessu_network
 volumes:
   postgres_data:
   splunk_var:
