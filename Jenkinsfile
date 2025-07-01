@@ -84,7 +84,17 @@ pipeline {
               }
             }
           }
-
+        
+        stage('Snyk Test') {
+          steps {
+            echo 'Testing...'
+            snykSecurity(
+              snykInstallation: 'snyk',
+              snykTokenId: 'snyk_token',
+            )
+          }
+        }
+        
         stage('Init Tag Info') {
             steps {
                 script {
