@@ -48,3 +48,4 @@ dist-ssr
 secrets.yml
 .vault_pass.txt
 .scannerwork/
+zap-report/

@@ -25,6 +25,7 @@ logs:
 	docker-compose -f $(COMPOSE_FILE) logs --tail=100 -f $(c)
 ps:
 	docker-compose -f $(COMPOSE_FILE) ps
+reload: down up
 
 %:
 	@:
