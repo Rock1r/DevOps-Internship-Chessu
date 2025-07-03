@@ -84,17 +84,27 @@ pipeline {
               }
             }
           }
-        
+
         stage('Snyk Test') {
-          steps {
-            echo 'Testing...'
-            snykSecurity(
-              snykInstallation: 'snyk',
-              snykTokenId: 'snyk_token',
-              failOnIssues: false,
-              additionalArguments: '--all-projects'
-            )
-          }
+            steps {
+                script {
+                    try {
+                        snykSecurity(
+                            snykInstallation: 'snyk',
+                            snykTokenId: 'snyk_token',
+                            additionalArguments: '--all-projects'
+                        )
+                    } catch (Exception e) {
+                        discordSend(
+                            webhookURL: env.DISCORD_WEBHOOK,
+                            title: env.JOB_NAME,
+                            description: "Snyk test failed: ${e.getMessage()}",
+                            link: env.BUILD_URL,
+                            result: 'FAILURE'
+                        )
+                    }
+                }
+            }
         }
 
         stage('Init Tag Info') {
