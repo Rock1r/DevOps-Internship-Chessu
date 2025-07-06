@@ -19,8 +19,7 @@ destroy:
 stop:
 	docker-compose -f $(COMPOSE_FILE) stop $(c)
 restart:
-	docker-compose -f $(COMPOSE_FILE) stop $(c)
-	docker-compose -f $(COMPOSE_FILE) up -d $(c)
+	docker-compose -f $(COMPOSE_FILE) restart $(c)
 logs:
 	docker-compose -f $(COMPOSE_FILE) logs --tail=100 -f $(c)
 ps:
