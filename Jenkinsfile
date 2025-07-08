@@ -6,11 +6,20 @@ pipeline {
     }
 
     triggers {
-        pollSCM('H/5 * * * *')
+        pollSCM('H/1 * * * *')
     }
-    
-    stages {
 
+    stages {
+        stage('Start Notification') {
+          steps {
+              discordSend(
+                webhookURL: env.DISCORD_WEBHOOK,
+                title: env.JOB_NAME,
+                description: "Pipeline STARTED: build #${env.BUILD_NUMBER}",
+                link: env.BUILD_URL,
+              )
+            }
+        }
         stage('Install Deps') {
             parallel {
                 stage('Frontend Install') {
@@ -56,23 +65,106 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
+
+        stage('SonarQube Analysis') {
+            steps{
+                script{
+                    def scannerHome = tool 'SonarScanner';
+                    withSonarQubeEnv() {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
+
+        stage("Quality Gate") {
+            steps {
+              timeout(time: 1, unit: 'HOURS') {
+                waitForQualityGate abortPipeline: true
+              }
+            }
+          }
+
+        stage('Snyk Test') {
+            steps {
+                script {
+                    try {
+                        snykSecurity(
+                            snykInstallation: 'snyk',
+                            snykTokenId: 'snyk_token',
+                            additionalArguments: '--all-projects'
+                        )
+                    } catch (Exception e) {
+                        discordSend(
+                            webhookURL: env.DISCORD_WEBHOOK,
+                            title: env.JOB_NAME,
+                            description: "Snyk test failed: ${e.getMessage()}",
+                            link: env.BUILD_URL,
+                            result: 'FAILURE'
+                        )
+                    }
+                }
+            }
+        }
+
+        stage('Init Tag Info') {
+            steps {
+                script {
+                    def branch = env.GIT_BRANCH?.replaceAll(/^origin\//, '')?.replaceAll('/', '-') ?: 'unknown'
+                    def shortCommit = env.GIT_COMMIT?.take(7) ?: '0000000'
+                    def timestamp = new Date(currentBuild.startTimeInMillis).format("yyyyMMdd-HHmm", TimeZone.getTimeZone('UTC'))
+                    env.IMAGE_TAG = "${branch}-${shortCommit}-${timestamp}"
+                }
+            }
+        }
+
+        stage('Docker Build') {
             parallel {
-                stage('Frontend Build') {
+                stage('Build Client Image') {
                     steps {
-                        dir('client') {
-                            sh 'pnpm build'
+                        script {
+                            client = docker.build("chessu/client:${IMAGE_TAG}", "-t chessu/client:latest -f Dockerfile_client --build-arg ${env.NGINX_URL} .")
                         }
                     }
                 }
-                stage('Backend Build') {
+                stage('Build Server Image') {
                     steps {
-                        dir('server') {
-                            sh 'pnpm build'
+                        script {
+                            server = docker.build("chessu/server:${IMAGE_TAG}", "-t chessu/server:latest -f Dockerfile_server .")
                         }
                     }
                 }
             }
         }
+        stage('Push images to AWS ECR'){
+            steps{
+                script{
+                    docker.withRegistry("https://${env.ECR_URI}", "ecr:${env.ECR_REGION}:aws-jenkins"){
+                        client.push()
+                        server.push()
+                    }
+                }
+            }
+        }
     }
+    post {
+    success {
+        discordSend(
+          webhookURL: env.DISCORD_WEBHOOK,
+          title: env.JOB_NAME,
+          description: "SUCCESS: build #${env.BUILD_NUMBER}",
+          link: env.BUILD_URL,
+          result: 'SUCCESS'
+        )
+    }
+    failure {
+        discordSend(
+          webhookURL: env.DISCORD_WEBHOOK,
+          title: env.JOB_NAME,
+          description: "FAILED: build #${env.BUILD_NUMBER}",
+          link: env.BUILD_URL,
+          result: 'FAILURE'
+        )
+    }
+  }
 }
