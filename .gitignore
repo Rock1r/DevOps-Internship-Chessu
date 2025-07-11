@@ -49,3 +49,6 @@ secrets.yml
 .vault_pass.txt
 .scannerwork/
 zap-report/
+
+.terraform*
+state.config
