@@ -40,7 +40,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-*.pem
+.pem
 
 .vagrant
 .cache
@@ -52,3 +52,5 @@ zap-report/
 
 .terraform*
 state.config
+*.tfvars
+*.tfstate
