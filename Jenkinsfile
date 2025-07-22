@@ -119,7 +119,7 @@ pipeline {
                 stage('Build Client Image') {
                     steps {
                         script {
-                            client = docker.build("chessu/client:${IMAGE_TAG}", "-t chessu/client:latest -f Dockerfile_client --build-arg ${env.NGINX_URL} .")
+                            client = docker.build("chessu/client:${IMAGE_TAG}", "-t chessu/client:latest -f Dockerfile_client --build-arg ${env.API_URL} .")
                         }
                     }
                 }

@@ -123,8 +123,8 @@ module "jenkins_node_sg" {
 
   ingress_with_source_security_group_id = [
     {
-      from_port                = 50000
-      to_port                  = 50000
+      from_port                = 0
+      to_port                  = 50001
       protocol                 = "tcp"
       description              = "Allow JNLP from Jenkins master"
       source_security_group_id = module.jenkins_sg.security_group_id

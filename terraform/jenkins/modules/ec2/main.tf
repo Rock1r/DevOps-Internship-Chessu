@@ -1,8 +1,3 @@
-resource "aws_iam_instance_profile" "jenkins_master_profile" {
-  name = "jenkins-master-instance-profile"
-  role = var.jenkins_master_role_name
-}
-
 module "ec2_instance" {
   source = "terraform-aws-modules/ec2-instance/aws"
 
@@ -14,9 +9,9 @@ module "ec2_instance" {
   vpc_security_group_ids      = var.jenkins_security_group_ids
   associate_public_ip_address = true
   user_data                   = local.user_data
-  key_name                    = "jenkins"
+  key_name                    = var.jenkins_master_key_name
   create_iam_instance_profile = false
-iam_instance_profile = aws_iam_instance_profile.jenkins_master_profile.name
+iam_instance_profile = var.jenkins_master_profile
 user_data_replace_on_change = true
 
   tags = {

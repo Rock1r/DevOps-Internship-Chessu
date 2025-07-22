@@ -5,4 +5,7 @@ resource "aws_ebs_volume" "jenkins_data" {
   tags = {
     Name = "jenkins-data"
   }
+  lifecycle {
+    prevent_destroy = true
+  }
 }

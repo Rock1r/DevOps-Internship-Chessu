@@ -1,4 +1,4 @@
-variable "jenkins_master_role_name" {
+variable "jenkins_master_profile" {
   type = string
 }
 

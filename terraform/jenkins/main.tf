@@ -11,7 +11,7 @@ module "iam" {
 
 module "jenkins_instance" {
   source = "./modules/ec2"
-  jenkins_master_role_name = module.iam.jenkins_master_iam_role_name
+  jenkins_master_profile = module.iam.jenkins_master_iam_profile
   public_subnets = data.terraform_remote_state.network-security.outputs.public_subnets
   jenkins_security_group_ids = [data.terraform_remote_state.network-security.outputs.jenkins_security_group_id]
   volume_id = module.jenkins_data.jenkins_data_id

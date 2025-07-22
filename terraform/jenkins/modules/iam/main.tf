@@ -90,19 +90,25 @@ resource "aws_iam_policy" "jenkins_master_policy" {
       {
         "Effect" : "Allow",
         "Action" : [
-          "ec2:RunInstances",
-          "ec2:TerminateInstances",
-          "ec2:StopInstances",
-          "ec2:StartInstances",
-          "ec2:DescribeInstances",
-          "ec2:DescribeImages",
-          "ec2:DescribeKeyPairs",
-          "ec2:DescribeSecurityGroups",
-          "ec2:DescribeSubnets",
-          "ec2:DescribeVpcs",
-          "ec2:DescribeRegions",
-          "ec2:CreateTags",
-          "ec2:DeleteTags"
+            "ec2:DescribeSpotInstanceRequests",
+            "ec2:CancelSpotInstanceRequests",
+            "ec2:GetConsoleOutput",
+            "ec2:RequestSpotInstances",
+            "ec2:RunInstances",
+            "ec2:StartInstances",
+            "ec2:StopInstances",
+            "ec2:TerminateInstances",
+            "ec2:CreateTags",
+            "ec2:DeleteTags",
+            "ec2:DescribeInstances",
+            "ec2:DescribeInstanceTypes",
+            "ec2:DescribeKeyPairs",
+            "ec2:DescribeRegions",
+            "ec2:DescribeImages",
+            "ec2:DescribeAvailabilityZones",
+            "ec2:DescribeSecurityGroups",
+            "ec2:DescribeSubnets",
+            "ec2:GetPasswordData"
         ],
         "Resource" : "*"
       },
@@ -125,10 +131,24 @@ resource "aws_iam_policy" "jenkins_master_policy" {
       },
       {
         "Effect" : "Allow",
-        "Action" : "iam:ListInstanceProfiles",
+        "Action" = [
+          "iam:ListInstanceProfiles",
+          "iam:CreateServiceLinkedRole",
+          "iam:ListRoles"
+        ]
+        
         "Resource" : "*"
       }
     ]
   })
 }
 
+resource "aws_iam_instance_profile" "jenkins_master_profile" {
+  name = "jenkins-master-instance-profile"
+  role = module.jenkins_master_role.iam_role_name
+}
+
+resource "aws_iam_instance_profile" "jenkins_node_profile" {
+  name = "jenkins-node-instance-profile"
+  role = module.jenkins_node_role.iam_role_name
+}
