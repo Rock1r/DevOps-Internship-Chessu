@@ -2,8 +2,8 @@ module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> 4.0"
 
-  domain_name  = var.domain
-  zone_id      = data.terraform_remote_state.network-security.outputs.hosted_zone_id
+  domain_name = var.domain
+  zone_id     = data.terraform_remote_state.network-security.outputs.hosted_zone_id
 
   validation_method = "DNS"
 
@@ -21,8 +21,8 @@ module "acm" {
 data "terraform_remote_state" "network-security" {
   backend = "s3"
   config = {
-    bucket         = var.remote_state_bucket
-    key            = var.remote_state_key
-    region         = var.remote_state_region
+    bucket = var.remote_state_bucket
+    key    = var.remote_state_key
+    region = var.remote_state_region
   }
 }

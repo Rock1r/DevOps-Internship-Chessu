@@ -1,11 +1,11 @@
 resource "aws_ecs_task_definition" "client" {
   family                   = "client-task"
   requires_compatibilities = ["FARGATE"]
-  network_mode            = "awsvpc"
-  cpu                     = "256"
-  memory                  = "512"
-  execution_role_arn      = "arn:aws:iam::122627526984:role/ecsTaskExecutionRole"
-task_role_arn           = aws_iam_role.ecs_task_role.arn
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = "arn:aws:iam::122627526984:role/ecsTaskExecutionRole"
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
   container_definitions = jsonencode([
     {
       name      = "client"
@@ -41,11 +41,11 @@ task_role_arn           = aws_iam_role.ecs_task_role.arn
 resource "aws_ecs_task_definition" "server" {
   family                   = "server-task"
   requires_compatibilities = ["FARGATE"]
-  network_mode            = "awsvpc"
-  cpu                     = "256"
-  memory                  = "512"
-  execution_role_arn      = "arn:aws:iam::122627526984:role/ecsTaskExecutionRole"
-  task_role_arn           = aws_iam_role.ecs_task_role.arn
+  network_mode             = "awsvpc"
+  cpu                      = "256"
+  memory                   = "512"
+  execution_role_arn       = "arn:aws:iam::122627526984:role/ecsTaskExecutionRole"
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
   container_definitions = jsonencode([
     {
       name      = "server"
@@ -112,9 +112,9 @@ resource "aws_ecs_task_definition" "server" {
 }
 
 resource "aws_cloudwatch_log_group" "chessu_server_logs" {
-  name = "chessu-server-logs"
+  name              = "chessu-server-logs"
   retention_in_days = 7
-  region = var.region
+  region            = var.region
   tags = {
     Environment = "development"
     Application = "server"
@@ -122,9 +122,9 @@ resource "aws_cloudwatch_log_group" "chessu_server_logs" {
 }
 
 resource "aws_cloudwatch_log_group" "chessu_client_logs" {
-  name = "chessu-client-logs"
+  name              = "chessu-client-logs"
   retention_in_days = 7
-  region = var.region
+  region            = var.region
   tags = {
     Environment = "development"
     Application = "client"

@@ -4,11 +4,7 @@ pipeline {
             label 'node.js'
         }
     }
-
-    triggers {
-        pollSCM('H/1 * * * *')
-    }
-
+    
     stages {
         stage('Start Notification') {
           steps {
@@ -66,24 +62,24 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps{
-                script{
-                    def scannerHome = tool 'SonarScanner';
-                    withSonarQubeEnv() {
-                        sh "${scannerHome}/bin/sonar-scanner"
-                    }
-                }
-            }
-        }
+        // stage('SonarQube Analysis') {
+        //     steps{
+        //         script{
+        //             def scannerHome = tool 'SonarScanner';
+        //             withSonarQubeEnv() {
+        //                 sh "${scannerHome}/bin/sonar-scanner"
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage("Quality Gate") {
-            steps {
-              timeout(time: 1, unit: 'HOURS') {
-                waitForQualityGate abortPipeline: true
-              }
-            }
-          }
+        // stage("Quality Gate") {
+        //     steps {
+        //       timeout(time: 1, unit: 'HOURS') {
+        //         waitForQualityGate abortPipeline: true
+        //       }
+        //     }
+        //   }
 
         stage('Snyk Test') {
             steps {

@@ -8,15 +8,15 @@ module "alb" {
   create_security_group      = false
   listeners = {
     https-reverse-proxy = {
-      port     = 443
-      protocol = "HTTPS"
+      port            = 443
+      protocol        = "HTTPS"
       certificate_arn = var.certificate_arn
       forward = {
         target_group_key = "client"
       }
       rules = {
         proxy-client = {
-          priority = 2
+          priority = 3
           actions = [{
             type             = "forward"
             target_group_key = "client"
@@ -28,14 +28,30 @@ module "alb" {
           }]
         },
         proxy-server = {
-          priority = 1
+          priority = 2
           actions = [{
             type             = "forward"
             target_group_key = "server"
+            stickiness = {
+              enabled  = true
+              duration = 3600
+            }
           }]
           conditions = [{
             path_pattern = {
               values = ["/v1/*", "/socket.io/*"]
+            }
+          }]
+        },
+        proxy-jenkins = {
+          priority = 1
+          actions = [{
+            type             = "forward"
+            target_group_key = "jenkins"
+          }]
+          conditions = [{
+            host_header = {
+              values = ["jenkins.*"]
             }
           }]
         }
@@ -96,6 +112,34 @@ module "alb" {
         timeout             = 6
         protocol            = "HTTP"
         matcher             = "200-499"
+      }
+      create_attachment = false
+    }
+
+    jenkins = {
+      name        = "jenkins-target-group"
+      protocol    = "HTTP"
+      port        = 8080
+      target_type = "instance"
+      target_group_health = {
+        dns_failover = {
+          minimum_healthy_targets_count = 1
+        }
+        unhealthy_state_routing = {
+          minimum_healthy_targets_percentage = 50
+        }
+      }
+
+      health_check = {
+        enabled             = true
+        interval            = 30
+        path                = "/"
+        port                = "traffic-port"
+        healthy_threshold   = 3
+        unhealthy_threshold = 3
+        timeout             = 6
+        protocol            = "HTTP"
+        matcher             = "200-399"
       }
       create_attachment = false
     }

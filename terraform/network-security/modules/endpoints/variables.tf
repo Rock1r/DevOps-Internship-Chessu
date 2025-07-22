@@ -28,11 +28,11 @@ variable "vpc_id" {
 
 variable "vpc_private_route_table_ids" {
   description = "List of private route table IDs for the VPC endpoints."
-  type        = list(string) 
+  type        = list(string)
 }
 
 variable "private_subnets" {
   description = "List of private subnet IDs for the VPC endpoints."
   type        = list(string)
-  
+
 }

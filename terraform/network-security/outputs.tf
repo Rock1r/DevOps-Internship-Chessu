@@ -32,3 +32,25 @@ output "server_service_security_group_id" {
   description = "Security group ID for the server ECS service"
   value       = module.security.server_service_security_group_id
 }
+
+output "jenkins_security_group_id" {
+  value = module.security.jenkins_sg_id
+}
+
+output "jenkins_master_key" {
+  value = module.ssh_keys.jenkins_master_key
+  sensitive = true
+}
+
+output "jenkins_master_key_name" {
+    value = module.ssh_keys.jenkins_master_key_name
+}
+
+output "jenkins_node_key" {
+  value = module.ssh_keys.jenkins_node_key_name
+  sensitive = true
+}
+
+output "jenkins_node_key_name" {
+    value = module.ssh_keys.jenkins_node_key_name
+}

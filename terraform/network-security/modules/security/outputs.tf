@@ -17,3 +17,7 @@ output "db_security_group_id" {
 output "ecr_endpoint_security_group_id" {
   value = module.ecr_endpoint_sg.security_group_id
 }
+
+output "jenkins_sg_id" {
+  value = module.jenkins_sg.security_group_id
+}

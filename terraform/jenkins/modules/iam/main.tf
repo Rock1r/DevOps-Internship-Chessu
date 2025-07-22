@@ -1,0 +1,134 @@
+module "jenkins_master_role" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+
+  create_role = true
+
+  role_name         = "jenkins-master"
+  role_requires_mfa = false
+
+  custom_role_policy_arns = [
+    aws_iam_policy.jenkins_master_policy.arn
+  ]
+  number_of_custom_role_policy_arns = 1
+
+  trusted_role_services = [
+    "ec2.amazonaws.com"
+  ]
+}
+
+module "jenkins_node_role" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+
+  create_role = true
+
+  role_name         = "jenkins-node"
+  role_requires_mfa = false
+
+  custom_role_policy_arns = [
+    aws_iam_policy.jenkins_node_policy.arn
+  ]
+  number_of_custom_role_policy_arns = 1
+
+  trusted_role_services = [
+    "ec2.amazonaws.com"
+  ]
+}
+
+resource "aws_iam_policy" "jenkins_node_policy" {
+  name        = "jenkins_node_policy"
+  path        = "/"
+  description = "Jenkins node policy for S3 artifacts and ECR image pushes"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:ListBucket"
+        ],
+        Resource = [
+          "arn:aws:s3:::${var.jenkins_bucket_name}",
+          "arn:aws:s3:::${var.jenkins_bucket_name}/*"
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:PutImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload"
+        ],
+        Resource = [var.client_repo, var.server_repo]
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_policy" "jenkins_master_policy" {
+  name        = "jenkins_master_policy"
+  path        = "/"
+  description = "Jenkins master policy"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:RunInstances",
+          "ec2:TerminateInstances",
+          "ec2:StopInstances",
+          "ec2:StartInstances",
+          "ec2:DescribeInstances",
+          "ec2:DescribeImages",
+          "ec2:DescribeKeyPairs",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeVpcs",
+          "ec2:DescribeRegions",
+          "ec2:CreateTags",
+          "ec2:DeleteTags"
+        ],
+        "Resource" : "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:ListBucket"
+        ],
+        Resource = [
+          "arn:aws:s3:::${var.jenkins_bucket_name}",
+          "arn:aws:s3:::${var.jenkins_bucket_name}/*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : "iam:PassRole",
+        "Resource" : module.jenkins_node_role.iam_role_arn
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : "iam:ListInstanceProfiles",
+        "Resource" : "*"
+      }
+    ]
+  })
+}
+

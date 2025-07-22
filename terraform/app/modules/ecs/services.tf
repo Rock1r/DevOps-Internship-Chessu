@@ -6,8 +6,8 @@ resource "aws_ecs_service" "client" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = var.public_subnets
-    security_groups = var.client_security_group_ids
+    subnets          = var.public_subnets
+    security_groups  = var.client_security_group_ids
     assign_public_ip = true
   }
 
@@ -28,8 +28,8 @@ resource "aws_ecs_service" "server" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = var.private_subnets
-    security_groups = var.server_security_group_ids
+    subnets          = var.private_subnets
+    security_groups  = var.server_security_group_ids
     assign_public_ip = false
   }
 
