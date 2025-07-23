@@ -119,7 +119,7 @@ stage('Build & Push Docker Images') {
                 stage('Build & Push') {
                     steps {
                         script {
-                            def image = docker.build("${env.ECR_URI}/chessu/client:${env.IMAGE_TAG}", "-t ${env.ECR_URI}/chessu/client:latest -f Dockerfile_client --build-arg API_URL=${env.API_URL} .")
+                            def image = docker.build("/chessu/client:${env.IMAGE_TAG}", "-t /chessu/client:latest -f Dockerfile_client --build-arg API_URL=${env.API_URL} .")
                             image.push("${env.IMAGE_TAG}")
                             image.push("latest")
                         }
@@ -141,7 +141,7 @@ stage('Build & Push Docker Images') {
                 stage('Build & Push') {
                     steps {
                         script {
-                            def image = docker.build("${env.ECR_URI}/chessu/server:${env.IMAGE_TAG}", "-t ${env.ECR_URI}/chessu/server:latest -f Dockerfile_server .")
+                            def image = docker.build("/chessu/server:${env.IMAGE_TAG}", "-t /chessu/server:latest -f Dockerfile_server .")
                             image.push("${env.IMAGE_TAG}")
                             image.push("latest")
                         }
