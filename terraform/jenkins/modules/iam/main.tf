@@ -90,25 +90,25 @@ resource "aws_iam_policy" "jenkins_master_policy" {
       {
         "Effect" : "Allow",
         "Action" : [
-            "ec2:DescribeSpotInstanceRequests",
-            "ec2:CancelSpotInstanceRequests",
-            "ec2:GetConsoleOutput",
-            "ec2:RequestSpotInstances",
-            "ec2:RunInstances",
-            "ec2:StartInstances",
-            "ec2:StopInstances",
-            "ec2:TerminateInstances",
-            "ec2:CreateTags",
-            "ec2:DeleteTags",
-            "ec2:DescribeInstances",
-            "ec2:DescribeInstanceTypes",
-            "ec2:DescribeKeyPairs",
-            "ec2:DescribeRegions",
-            "ec2:DescribeImages",
-            "ec2:DescribeAvailabilityZones",
-            "ec2:DescribeSecurityGroups",
-            "ec2:DescribeSubnets",
-            "ec2:GetPasswordData"
+          "ec2:DescribeSpotInstanceRequests",
+          "ec2:CancelSpotInstanceRequests",
+          "ec2:GetConsoleOutput",
+          "ec2:RequestSpotInstances",
+          "ec2:RunInstances",
+          "ec2:StartInstances",
+          "ec2:StopInstances",
+          "ec2:TerminateInstances",
+          "ec2:CreateTags",
+          "ec2:DeleteTags",
+          "ec2:DescribeInstances",
+          "ec2:DescribeInstanceTypes",
+          "ec2:DescribeKeyPairs",
+          "ec2:DescribeRegions",
+          "ec2:DescribeImages",
+          "ec2:DescribeAvailabilityZones",
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeSubnets",
+          "ec2:GetPasswordData"
         ],
         "Resource" : "*"
       },
@@ -136,7 +136,7 @@ resource "aws_iam_policy" "jenkins_master_policy" {
           "iam:CreateServiceLinkedRole",
           "iam:ListRoles"
         ]
-        
+
         "Resource" : "*"
       }
     ]

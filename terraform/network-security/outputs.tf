@@ -38,19 +38,19 @@ output "jenkins_security_group_id" {
 }
 
 output "jenkins_master_key" {
-  value = module.ssh_keys.jenkins_master_key
+  value     = module.ssh_keys.jenkins_master_key
   sensitive = true
 }
 
 output "jenkins_master_key_name" {
-    value = module.ssh_keys.jenkins_master_key_name
+  value = module.ssh_keys.jenkins_master_key_name
 }
 
 output "jenkins_node_key" {
-  value = module.ssh_keys.jenkins_node_key_name
+  value     = module.ssh_keys.jenkins_node_key_name
   sensitive = true
 }
 
 output "jenkins_node_key_name" {
-    value = module.ssh_keys.jenkins_node_key_name
+  value = module.ssh_keys.jenkins_node_key_name
 }

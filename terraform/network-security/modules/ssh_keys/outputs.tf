@@ -3,7 +3,7 @@ output "jenkins_master_key" {
 }
 
 output "jenkins_master_key_name" {
-    value = aws_key_pair.jenkins_key.key_name
+  value = aws_key_pair.jenkins_key.key_name
 }
 
 output "jenkins_node_key" {
@@ -11,5 +11,5 @@ output "jenkins_node_key" {
 }
 
 output "jenkins_node_key_name" {
-    value = aws_key_pair.jenkins_node_key.key_name
+  value = aws_key_pair.jenkins_node_key.key_name
 }

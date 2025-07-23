@@ -3,20 +3,20 @@ module "jenkins_data" {
 }
 
 module "iam" {
-  source = "./modules/iam"
-  client_repo = data.terraform_remote_state.ecr.outputs.client_repository_arn
-  server_repo = data.terraform_remote_state.ecr.outputs.server_repository_arn
+  source              = "./modules/iam"
+  client_repo         = data.terraform_remote_state.ecr.outputs.client_repository_arn
+  server_repo         = data.terraform_remote_state.ecr.outputs.server_repository_arn
   jenkins_bucket_name = var.jenkins_bucket_name
 }
 
 module "jenkins_instance" {
-  source = "./modules/ec2"
-  jenkins_master_profile = module.iam.jenkins_master_iam_profile
-  public_subnets = data.terraform_remote_state.network-security.outputs.public_subnets
+  source                     = "./modules/ec2"
+  jenkins_master_profile     = module.iam.jenkins_master_iam_profile
+  public_subnets             = data.terraform_remote_state.network-security.outputs.public_subnets
   jenkins_security_group_ids = [data.terraform_remote_state.network-security.outputs.jenkins_security_group_id]
-  volume_id = module.jenkins_data.jenkins_data_id
-  target_group_arn = data.terraform_remote_state.alb.outputs.jenkins_tg
-  jenkins_master_key_name = data.terraform_remote_state.network-security.outputs.jenkins_master_key_name
+  volume_id                  = module.jenkins_data.jenkins_data_id
+  target_group_arn           = data.terraform_remote_state.alb.outputs.jenkins_tg
+  jenkins_master_key_name    = data.terraform_remote_state.network-security.outputs.jenkins_master_key_name
 }
 
 data "terraform_remote_state" "alb" {

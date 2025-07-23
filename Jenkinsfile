@@ -4,6 +4,10 @@ pipeline {
             label 'node.js'
         }
     }
+
+    tools {
+        nodejs 'node' 
+    }
     
     stages {
         stage('Start Notification') {

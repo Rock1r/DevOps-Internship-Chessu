@@ -1,8 +1,8 @@
 module "ec2_instance" {
   source = "terraform-aws-modules/ec2-instance/aws"
 
-  name = "jenkins-master"
-  ami = "ami-020cba7c55df1f615"
+  name                        = "jenkins-master"
+  ami                         = "ami-020cba7c55df1f615"
   instance_type               = "t2.micro"
   subnet_id                   = var.public_subnets[0]
   create_security_group       = false
@@ -11,8 +11,8 @@ module "ec2_instance" {
   user_data                   = local.user_data
   key_name                    = var.jenkins_master_key_name
   create_iam_instance_profile = false
-iam_instance_profile = var.jenkins_master_profile
-user_data_replace_on_change = true
+  iam_instance_profile        = var.jenkins_master_profile
+  user_data_replace_on_change = true
 
   tags = {
     Terraform   = "true"
@@ -21,9 +21,9 @@ user_data_replace_on_change = true
 }
 
 resource "aws_volume_attachment" "jenkins_ebs_attach" {
-  device_name = "/dev/xvdf" 
-  volume_id   = var.volume_id
-  instance_id = module.ec2_instance.id
+  device_name  = "/dev/xvdf"
+  volume_id    = var.volume_id
+  instance_id  = module.ec2_instance.id
   force_detach = true
 }
 
