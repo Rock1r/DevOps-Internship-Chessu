@@ -104,34 +104,31 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('Build & Push Docker Images') {
             parallel {
-                stage('Build Client Image') {
+                stage('Build & Push Client') {
                     agent { label 'docker' }
                     steps {
                         script {
-                            client = docker.build("chessu/client:${IMAGE_TAG}", "-t chessu/client:latest -f Dockerfile_client --build-arg ${env.API_URL} .")
-                        }
-                    }
-                }
-                stage('Build Server Image') {
-                    agent { label 'docker' }
-                    steps {
-                        script {
-                            server = docker.build("chessu/server:${IMAGE_TAG}", "-t chessu/server:latest -f Dockerfile_server .")
-                        }
-                    }
-                }
-            }
-        }
+                            client = docker.build("chessu/client:${env.IMAGE_TAG}", "-t chessu/client:latest -f Dockerfile_client --build-arg ${env.API_URL} .")
 
-        stage('Push images to AWS ECR') {
-            agent { label 'node.js' }
-            steps {
-                script {
-                    docker.withRegistry("https://${env.ECR_URI}", "ecr:${env.ECR_REGION}:aws-jenkins") {
-                        client.push()
-                        server.push()
+                            docker.withRegistry("https://${env.ECR_URI}", "ecr:${env.ECR_REGION}:aws-jenkins") {
+                                client.push()
+                            }
+                        }
+                    }
+                }
+
+                stage('Build & Push Server') {
+                    agent { label 'docker' }
+                    steps {
+                        script {
+                            server = docker.build("chessu/server:${env.IMAGE_TAG}", "-t chessu/server:latest -f Dockerfile_server .")
+
+                            docker.withRegistry("https://${env.ECR_URI}", "ecr:${env.ECR_REGION}:aws-jenkins") {
+                                server.push()
+                            }
+                        }
                     }
                 }
             }
