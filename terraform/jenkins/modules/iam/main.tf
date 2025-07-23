@@ -45,14 +45,9 @@ resource "aws_iam_policy" "jenkins_node_policy" {
       {
         Effect = "Allow",
         Action = [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:ListBucket"
+          "ecs:UpdateService"
         ],
-        Resource = [
-          "arn:aws:s3:::${var.jenkins_bucket_name}",
-          "arn:aws:s3:::${var.jenkins_bucket_name}/*"
-        ]
+        Resource = "*"
       },
       {
         Effect = "Allow",
@@ -111,18 +106,6 @@ resource "aws_iam_policy" "jenkins_master_policy" {
           "ec2:GetPasswordData"
         ],
         "Resource" : "*"
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "s3:PutObject",
-          "s3:GetObject",
-          "s3:ListBucket"
-        ],
-        Resource = [
-          "arn:aws:s3:::${var.jenkins_bucket_name}",
-          "arn:aws:s3:::${var.jenkins_bucket_name}/*"
-        ]
       },
       {
         "Effect" : "Allow",
