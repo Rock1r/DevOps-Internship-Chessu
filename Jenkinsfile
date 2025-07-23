@@ -1,28 +1,27 @@
 pipeline {
-    agent {
-        node {
-            label 'node.js'
-        }
-    }
+    agent none
 
     tools {
-        nodejs 'node' 
+        nodejs 'node'
     }
-    
+
     stages {
         stage('Start Notification') {
-          steps {
-              discordSend(
-                webhookURL: env.DISCORD_WEBHOOK,
-                title: env.JOB_NAME,
-                description: "Pipeline STARTED: build #${env.BUILD_NUMBER}",
-                link: env.BUILD_URL,
-              )
+            agent { label 'node.js' }
+            steps {
+                discordSend(
+                    webhookURL: env.DISCORD_WEBHOOK,
+                    title: env.JOB_NAME,
+                    description: "Pipeline STARTED: build #${env.BUILD_NUMBER}",
+                    link: env.BUILD_URL,
+                )
             }
         }
+
         stage('Install Deps') {
             parallel {
                 stage('Frontend Install') {
+                    agent { label 'node.js' }
                     steps {
                         dir('client') {
                             sh 'pnpm install --frozen-lockfile'
@@ -30,6 +29,7 @@ pipeline {
                     }
                 }
                 stage('Backend Install') {
+                    agent { label 'node.js' }
                     steps {
                         dir('server') {
                             sh 'pnpm install --frozen-lockfile'
@@ -40,6 +40,7 @@ pipeline {
         }
 
         stage('Lint') {
+            agent { label 'node.js' }
             steps {
                 dir('chessu') {
                     sh 'pnpm lint'
@@ -50,6 +51,7 @@ pipeline {
         stage('Test') {
             parallel {
                 stage('Frontend Test') {
+                    agent { label 'node.js' }
                     steps {
                         dir('client') {
                             sh 'pnpm test'
@@ -57,6 +59,7 @@ pipeline {
                     }
                 }
                 stage('Backend Test') {
+                    agent { label 'node.js' }
                     steps {
                         dir('server') {
                             sh 'pnpm test'
@@ -66,26 +69,8 @@ pipeline {
             }
         }
 
-        // stage('SonarQube Analysis') {
-        //     steps{
-        //         script{
-        //             def scannerHome = tool 'SonarScanner';
-        //             withSonarQubeEnv() {
-        //                 sh "${scannerHome}/bin/sonar-scanner"
-        //             }
-        //         }
-        //     }
-        // }
-
-        // stage("Quality Gate") {
-        //     steps {
-        //       timeout(time: 1, unit: 'HOURS') {
-        //         waitForQualityGate abortPipeline: true
-        //       }
-        //     }
-        //   }
-
         stage('Snyk Test') {
+            agent any
             steps {
                 script {
                     try {
@@ -108,6 +93,7 @@ pipeline {
         }
 
         stage('Init Tag Info') {
+            agent any
             steps {
                 script {
                     def branch = env.GIT_BRANCH?.replaceAll(/^origin\//, '')?.replaceAll('/', '-') ?: 'unknown'
@@ -121,6 +107,7 @@ pipeline {
         stage('Docker Build') {
             parallel {
                 stage('Build Client Image') {
+                    agent { label 'docker' }
                     steps {
                         script {
                             client = docker.build("chessu/client:${IMAGE_TAG}", "-t chessu/client:latest -f Dockerfile_client --build-arg ${env.API_URL} .")
@@ -128,6 +115,7 @@ pipeline {
                     }
                 }
                 stage('Build Server Image') {
+                    agent { label 'docker' }
                     steps {
                         script {
                             server = docker.build("chessu/server:${IMAGE_TAG}", "-t chessu/server:latest -f Dockerfile_server .")
@@ -136,10 +124,12 @@ pipeline {
                 }
             }
         }
-        stage('Push images to AWS ECR'){
-            steps{
-                script{
-                    docker.withRegistry("https://${env.ECR_URI}", "ecr:${env.ECR_REGION}:aws-jenkins"){
+
+        stage('Push images to AWS ECR') {
+            agent { label 'node.js' }
+            steps {
+                script {
+                    docker.withRegistry("https://${env.ECR_URI}", "ecr:${env.ECR_REGION}:aws-jenkins") {
                         client.push()
                         server.push()
                     }
@@ -147,24 +137,25 @@ pipeline {
             }
         }
     }
+
     post {
-    success {
-        discordSend(
-          webhookURL: env.DISCORD_WEBHOOK,
-          title: env.JOB_NAME,
-          description: "SUCCESS: build #${env.BUILD_NUMBER}",
-          link: env.BUILD_URL,
-          result: 'SUCCESS'
-        )
+        success {
+            discordSend(
+                webhookURL: env.DISCORD_WEBHOOK,
+                title: env.JOB_NAME,
+                description: "SUCCESS: build #${env.BUILD_NUMBER}",
+                link: env.BUILD_URL,
+                result: 'SUCCESS'
+            )
+        }
+        failure {
+            discordSend(
+                webhookURL: env.DISCORD_WEBHOOK,
+                title: env.JOB_NAME,
+                description: "FAILED: build #${env.BUILD_NUMBER}",
+                link: env.BUILD_URL,
+                result: 'FAILURE'
+            )
+        }
     }
-    failure {
-        discordSend(
-          webhookURL: env.DISCORD_WEBHOOK,
-          title: env.JOB_NAME,
-          description: "FAILED: build #${env.BUILD_NUMBER}",
-          link: env.BUILD_URL,
-          result: 'FAILURE'
-        )
-    }
-  }
 }
