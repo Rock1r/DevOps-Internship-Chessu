@@ -109,17 +109,20 @@ stage('Build & Push Docker Images') {
         stage('Build & Push Client') {
             agent { label 'docker' }
             stages {
-                stage('Login to ECR') {
-                    steps {
-                        withAWS(region: "${env.ECR_REGION}") {
-                            ecrLogin()
-                        }
-                    }
-                }
+        stage('Login to ECR') {
+          steps {
+            withAWS(region: "${env.ECR_REGION}") {
+              sh """
+                aws ecr get-login-password --region ${env.ECR_REGION} | \
+                docker login --username AWS --password-stdin ${env.ECR_URI}
+              """
+            }
+          }
+        }
                 stage('Build & Push') {
                     steps {
                         script {
-                            def image = docker.build("${env.ECR_URI}chessu/client:${env.IMAGE_TAG}", "-t ${env.ECR_URI}chessu/client:latest -f Dockerfile_client --build-arg API_URL=${env.API_URL} .")
+                            def image = docker.build("${env.ECR_URI}/chessu/client:${env.IMAGE_TAG}", "-t ${env.ECR_URI}chessu/client:latest -f Dockerfile_client --build-arg API_URL=${env.API_URL} .")
                             image.push("${env.IMAGE_TAG}")
                             image.push("latest")
                         }
@@ -131,17 +134,20 @@ stage('Build & Push Docker Images') {
         stage('Build & Push Server') {
             agent { label 'docker' }
             stages {
-                stage('Login to ECR') {
-                    steps {
-                        withAWS(region: "${env.ECR_REGION}") {
-                            ecrLogin()
-                        }
-                    }
-                }
+        stage('Login to ECR') {
+          steps {
+            withAWS(region: "${env.ECR_REGION}") {
+              sh """
+                aws ecr get-login-password --region ${env.ECR_REGION} | \
+                docker login --username AWS --password-stdin ${env.ECR_URI}
+              """
+            }
+          }
+        }
                 stage('Build & Push') {
                     steps {
                         script {
-                            def image = docker.build("${env.ECR_URI}chessu/server:${env.IMAGE_TAG}", "-t ${env.ECR_URI}chessu/server:latest -f Dockerfile_server .")
+                            def image = docker.build("${env.ECR_URI}/chessu/server:${env.IMAGE_TAG}", "-t ${env.ECR_URI}chessu/server:latest -f Dockerfile_server .")
                             image.push("${env.IMAGE_TAG}")
                             image.push("latest")
                         }
