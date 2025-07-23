@@ -52,6 +52,13 @@ resource "aws_iam_policy" "jenkins_node_policy" {
       {
         Effect = "Allow",
         Action = [
+          "ecr:GetAuthorizationToken"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
           "ecr:BatchCheckLayerAvailability",
           "ecr:GetDownloadUrlForLayer",
           "ecr:BatchGetImage",
@@ -104,13 +111,6 @@ resource "aws_iam_policy" "jenkins_master_policy" {
         "Effect" : "Allow",
         "Action" : "iam:PassRole",
         "Resource" : module.jenkins_node_role.iam_role_arn
-      },
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "ecr:GetAuthorizationToken"
-        ],
-        "Resource" : "*"
       },
       {
         "Effect" : "Allow",
