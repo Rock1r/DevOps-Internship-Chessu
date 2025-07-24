@@ -10,6 +10,16 @@ pipeline {
     }
 
     stages {
+        stage('Start Notification') {
+            steps {
+                discordSend(
+                    webhookURL: env.DISCORD_WEBHOOK,
+                    title: env.JOB_NAME,
+                    description: "Deploy STARTED:",
+                    link: env.BUILD_URL,
+                )
+            }
+        }
         stage('Login to ECR') {
             steps {
                 withAWS(region: "${env.ECR_REGION}") {
@@ -29,7 +39,7 @@ pipeline {
                                 script {
                                     def img = docker.image("${ECR_URI}/chessu/client:${IMAGE_TAG}")
                                     img.pull()
-                                    img.tag("${ECR_URI}/chessu/client:prod")
+                                    img.tag("${ECR_URI}/chessu/client", "prod")
                                     docker.image("${ECR_URI}/chessu/client:prod").push()
                                 }
                             }
@@ -44,7 +54,7 @@ pipeline {
                                 script {
                                     def img = docker.image("${ECR_URI}/chessu/server:${IMAGE_TAG}")
                                     img.pull()
-                                    img.tag("${ECR_URI}/chessu/server:prod")
+                                    img.tag("${ECR_URI}/chessu/server", "prod")
                                     docker.image("${ECR_URI}/chessu/server:prod").push()
                                 }
                             }
