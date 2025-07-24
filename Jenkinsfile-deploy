@@ -1,6 +1,10 @@
 pipeline {
     agent { label 'docker' }
 
+    parameters([
+      string(name: 'IMAGE_TAG', description: 'Tag of the image to promote to prod')
+    ])
+
     environment {
         IMAGE_TAG = "${params.IMAGE_TAG}"
     }
@@ -73,7 +77,7 @@ pipeline {
             discordSend(
                 webhookURL: DISCORD_WEBHOOK,
                 title: JOB_NAME,
-                description: "✅ Deploy SUCCESS: `${IMAGE_TAG}` → `prod`, ECS updated",
+                description: "Deploy SUCCESS: `${IMAGE_TAG}` → `prod`, ECS updated",
                 link: env.BUILD_URL,
                 result: 'SUCCESS'
             )
@@ -82,7 +86,7 @@ pipeline {
             discordSend(
                 webhookURL: DISCORD_WEBHOOK,
                 title: JOB_NAME,
-                description: "❌ Deploy FAILED for `${IMAGE_TAG}`",
+                description: "Deploy FAILED for `${IMAGE_TAG}`",
                 link: env.BUILD_URL,
                 result: 'FAILURE'
             )
