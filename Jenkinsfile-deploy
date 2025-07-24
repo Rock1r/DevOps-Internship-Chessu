@@ -1,9 +1,9 @@
 pipeline {
     agent { label 'docker' }
 
-    parameters([
+    parameters{
       string(name: 'IMAGE_TAG', description: 'Tag of the image to promote to prod')
-    ])
+    }
 
     environment {
         IMAGE_TAG = "${params.IMAGE_TAG}"
