@@ -1,13 +1,3 @@
-variable "client_image" {
-  description = "The ECR repository for the client service"
-  type        = string
-}
-
-variable "server_image" {
-  description = "The ECR repository for the server service"
-  type        = string
-}
-
 variable "network_bucket" {
   description = "The S3 bucket for remote state storage"
   type        = string

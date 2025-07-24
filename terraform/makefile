@@ -1,8 +1,8 @@
-.PHONY:  jenkins
+.PHONY:  jenkins app
 
 default: infrastructure
 
-infrastructure:
+app:
 	cd network-security && terraform apply -auto-approve
 	cd app && terraform apply -auto-approve
 

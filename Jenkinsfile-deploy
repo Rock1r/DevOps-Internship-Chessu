@@ -39,7 +39,7 @@ pipeline {
                                 script {
                                     def img = docker.image("${ECR_URI}/chessu/client:${IMAGE_TAG}")
                                     img.pull()
-                                    img.push("${ECR_URI}/chessu/client:prod")
+                                    img.push("prod")
                                 }
                             }
                         }
@@ -53,7 +53,7 @@ pipeline {
                                 script {
                                     def img = docker.image("${ECR_URI}/chessu/server:${IMAGE_TAG}")
                                     img.pull()
-                                    img.push("${ECR_URI}/chessu/server:prod")
+                                    img.push("prod")
                                 }
                             }
                         }
@@ -65,21 +65,21 @@ pipeline {
         stage('Trigger ECS Service Update') {
             steps {
                 withAWS(region: "${ECR_REGION}") {
-                    ecsUpdateService(
-                        cluster: "${env.CLUSTER_NAME}",
-                        serviceName: "${env.CLIENT_SERVICE_NAME}",
-                        forceNewDeployment: true
-                    )
-                    ecsUpdateService(
-                        cluster: "${env.CLUSTER_NAME}",
-                        serviceName: "${env.SERVER_SERVICE_NAME}",
-                        forceNewDeployment: true
-                    )
+                    sh """
+                        aws ecs update-service \
+                            --cluster ${env.CLUSTER_NAME} \
+                            --service ${env.CLIENT_SERVICE_NAME} \
+                            --force-new-deployment
+
+                        aws ecs update-service \
+                            --cluster ${env.CLUSTER_NAME} \
+                            --service ${env.SERVER_SERVICE_NAME} \
+                            --force-new-deployment
+                    """
                 }
             }
         }
     }
-
     post {
         success {
             discordSend(

@@ -53,8 +53,8 @@ data "terraform_remote_state" "acm" {
 data "terraform_remote_state" "ecr" {
   backend = "s3"
   config = {
-    bucket = var.acm_bucket
-    key    = var.acm_bucket_key
-    region = var.acm_bucket_region
+    bucket = var.ecr_bucket
+    key    = var.ecr_bucket_key
+    region = var.ecr_bucket_region
   }
 }
