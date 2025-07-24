@@ -1,0 +1,91 @@
+pipeline {
+    agent { label 'docker' }
+
+    environment {
+        IMAGE_TAG = "${params.IMAGE_TAG}"
+    }
+
+    stages {
+        stage('Login to ECR') {
+            steps {
+                withAWS(region: "${env.ECR_REGION}") {
+                    sh """
+                       aws ecr get-login-password --region ${env.ECR_REGION} | \
+                       docker login --username AWS --password-stdin ${env.ECR_URI}
+                     """
+                }
+            }
+        }
+        stage('Pull, Tag, Push') {
+            parallel {
+                stage('Client Image') {
+                    stages {
+                        stage('Pull & Tag & Push Client') {
+                            steps {
+                                script {
+                                    def img = docker.image("${ECR_URI}/chessu/client:${IMAGE_TAG}")
+                                    img.pull()
+                                    img.tag("${ECR_URI}/chessu/client:prod")
+                                    docker.image("${ECR_URI}/chessu/client:prod").push()
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('Server Image') {
+                    stages {
+                        stage('Pull & Tag & Push Server') {
+                            steps {
+                                script {
+                                    def img = docker.image("${ECR_URI}/chessu/server:${IMAGE_TAG}")
+                                    img.pull()
+                                    img.tag("${ECR_URI}/chessu/server:prod")
+                                    docker.image("${ECR_URI}/chessu/server:prod").push()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Trigger ECS Service Update') {
+            steps {
+                withAWS(region: "${ECR_REGION}") {
+                    ecsUpdateService(
+                        cluster: "${env.CLUSTER_NAME}",
+                        serviceName: "${env.CLIENT_SERVICE_NAME}",
+                        forceNewDeployment: true
+                    )
+                    ecsUpdateService(
+                        cluster: "${env.CLUSTER_NAME}",
+                        serviceName: "${env.SERVER_SERVICE_NAME}",
+                        forceNewDeployment: true
+                    )
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            discordSend(
+                webhookURL: DISCORD_WEBHOOK,
+                title: JOB_NAME,
+                description: "✅ Deploy SUCCESS: `${IMAGE_TAG}` → `prod`, ECS updated",
+                link: env.BUILD_URL,
+                result: 'SUCCESS'
+            )
+        }
+        failure {
+            discordSend(
+                webhookURL: DISCORD_WEBHOOK,
+                title: JOB_NAME,
+                description: "❌ Deploy FAILED for `${IMAGE_TAG}`",
+                link: env.BUILD_URL,
+                result: 'FAILURE'
+            )
+        }
+    }
+}

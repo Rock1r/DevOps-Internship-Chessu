@@ -98,66 +98,65 @@ pipeline {
                 script {
                     def branch = env.GIT_BRANCH?.replaceAll(/^origin\//, '')?.replaceAll('/', '-') ?: 'unknown'
                     def shortCommit = env.GIT_COMMIT?.take(7) ?: '0000000'
-                    def timestamp = new Date(currentBuild.startTimeInMillis).format("yyyyMMdd-HHmm", TimeZone.getTimeZone('UTC'))
+                    def timestamp = new Date(currentBuild.startTimeInMillis).format('yyyyMMdd-HHmm', TimeZone.getTimeZone('UTC'))
                     env.IMAGE_TAG = "${branch}-${shortCommit}-${timestamp}"
                 }
             }
         }
 
-stage('Build & Push Docker Images') {
-    parallel {
-        stage('Build & Push Client') {
-            agent { label 'docker' }
-            stages {
-        stage('Login to ECR') {
-          steps {
-            withAWS(region: "${env.ECR_REGION}") {
-              sh """
-                aws ecr get-login-password --region ${env.ECR_REGION} | \
-                docker login --username AWS --password-stdin ${env.ECR_URI}
-              """
-            }
-          }
-        }
-                stage('Build & Push') {
-                    steps {
-                        script {
-                            def image = docker.build("${env.ECR_URI}/chessu/client:${env.IMAGE_TAG}", "-t ${env.ECR_URI}chessu/client:latest -f Dockerfile_client --build-arg API_URL=${env.API_URL} .")
-                            image.push("${env.IMAGE_TAG}")
-                            image.push("latest")
+        stage('Build & Push Docker Images') {
+            parallel {
+                stage('Build & Push Client') {
+                    agent { label 'docker' }
+                    stages {
+                        stage('Login to ECR') {
+                            steps {
+                                withAWS(region: "${env.ECR_REGION}") {
+                                    sh """
+                                       aws ecr get-login-password --region ${env.ECR_REGION} | \
+                                       docker login --username AWS --password-stdin ${env.ECR_URI}
+                                     """
+                                }
+                            }
+                        }
+                        stage('Build & Push') {
+                            steps {
+                                script {
+                                    def image = docker.build("${env.ECR_URI}/chessu/client:${env.IMAGE_TAG}", "-t ${env.ECR_URI}chessu/client:latest -f Dockerfile_client --build-arg API_URL=${env.API_URL} .")
+                                    image.push("${env.IMAGE_TAG}")
+                                    image.push('latest')
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('Build & Push Server') {
+                    agent { label 'docker' }
+                    stages {
+                        stage('Login to ECR') {
+                            steps {
+                                withAWS(region: "${env.ECR_REGION}") {
+                                    sh """
+                                      aws ecr get-login-password --region ${env.ECR_REGION} | \
+                                      docker login --username AWS --password-stdin ${env.ECR_URI}
+                                    """
+                                }
+                            }
+                        }
+                        stage('Build & Push') {
+                            steps {
+                                script {
+                                    def image = docker.build("${env.ECR_URI}/chessu/server:${env.IMAGE_TAG}", "-t ${env.ECR_URI}chessu/server:latest -f Dockerfile_server .")
+                                    image.push("${env.IMAGE_TAG}")
+                                    image.push('latest')
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-
-        stage('Build & Push Server') {
-            agent { label 'docker' }
-            stages {
-        stage('Login to ECR') {
-          steps {
-            withAWS(region: "${env.ECR_REGION}") {
-              sh """
-                aws ecr get-login-password --region ${env.ECR_REGION} | \
-                docker login --username AWS --password-stdin ${env.ECR_URI}
-              """
-            }
-          }
-        }
-                stage('Build & Push') {
-                    steps {
-                        script {
-                            def image = docker.build("${env.ECR_URI}/chessu/server:${env.IMAGE_TAG}", "-t ${env.ECR_URI}chessu/server:latest -f Dockerfile_server .")
-                            image.push("${env.IMAGE_TAG}")
-                            image.push("latest")
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
     }
 
     post {
