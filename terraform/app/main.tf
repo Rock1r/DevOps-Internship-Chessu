@@ -12,8 +12,8 @@ module "alb" {
 module "ecs" {
   source = "./modules/ecs"
 
-  client_image              = var.client_image
-  server_image              = var.server_image
+  client_image              = "${data.terraform_remote_state.ecr.outputs.client_repository_url}:prod"
+  server_image              = "${data.terraform_remote_state.ecr.outputs.server_repository_url}:prod"
   client_tg_arn             = module.alb.client_tg_arn
   server_tg_arn             = module.alb.server_tg_arn
   private_subnets           = data.terraform_remote_state.network-security.outputs.private_subnets
@@ -42,6 +42,15 @@ data "terraform_remote_state" "route53" {
 }
 
 data "terraform_remote_state" "acm" {
+  backend = "s3"
+  config = {
+    bucket = var.acm_bucket
+    key    = var.acm_bucket_key
+    region = var.acm_bucket_region
+  }
+}
+
+data "terraform_remote_state" "ecr" {
   backend = "s3"
   config = {
     bucket = var.acm_bucket

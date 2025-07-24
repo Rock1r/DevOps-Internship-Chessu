@@ -39,8 +39,7 @@ pipeline {
                                 script {
                                     def img = docker.image("${ECR_URI}/chessu/client:${IMAGE_TAG}")
                                     img.pull()
-                                    img.tag("${ECR_URI}/chessu/client", "prod")
-                                    docker.image("${ECR_URI}/chessu/client:prod").push()
+                                    img.push("${ECR_URI}/chessu/client:prod")
                                 }
                             }
                         }
@@ -54,8 +53,7 @@ pipeline {
                                 script {
                                     def img = docker.image("${ECR_URI}/chessu/server:${IMAGE_TAG}")
                                     img.pull()
-                                    img.tag("${ECR_URI}/chessu/server", "prod")
-                                    docker.image("${ECR_URI}/chessu/server:prod").push()
+                                    img.push("${ECR_URI}/chessu/server:prod")
                                 }
                             }
                         }
