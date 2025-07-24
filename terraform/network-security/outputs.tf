@@ -47,7 +47,7 @@ output "jenkins_master_key_name" {
 }
 
 output "jenkins_node_key" {
-  value     = module.ssh_keys.jenkins_node_key_name
+  value     = module.ssh_keys.jenkins_node_key
   sensitive = true
 }
 

@@ -87,6 +87,13 @@ module "ecr_endpoint_sg" {
       protocol                 = "tcp"
       description              = "Allow HTTPS from server-service"
       source_security_group_id = module.server_service_sg.security_group_id
+    },
+    {
+      from_port                = 443
+      to_port                  = 443
+      protocol                 = "tcp"
+      description              = "Allow HTTPS from jenkins node"
+      source_security_group_id = module.jenkins_node_sg.security_group_id
     }
   ]
 
