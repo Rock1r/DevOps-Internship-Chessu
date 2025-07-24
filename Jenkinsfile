@@ -122,7 +122,7 @@ pipeline {
                         stage('Build & Push') {
                             steps {
                                 script {
-                                    def image = docker.build("${env.ECR_URI}/chessu/client:${env.IMAGE_TAG}", "-t ${env.ECR_URI}chessu/client:latest -f Dockerfile_client --build-arg API_URL=${env.NEXT_PUBLIC_API_URL} .")
+                                    def image = docker.build("${env.ECR_URI}/chessu/client:${env.IMAGE_TAG}", "-t ${env.ECR_URI}chessu/client:latest -f Dockerfile_client --build-arg NEXT_PUBLIC_API_URL=${env.NEXT_PUBLIC_API_URL} .")
                                     image.push("${env.IMAGE_TAG}")
                                     image.push('latest')
                                 }
