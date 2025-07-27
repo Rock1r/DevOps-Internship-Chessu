@@ -1,4 +1,91 @@
-Forked from project by Nathaniel Tampus (MIT License)
+
+## Infrastructure Overview
+
+This repository provides multiple approaches for deploying and managing the chessu application. You can choose between **Terraform** for cloud infrastructure provisioning, or **Ansible** and **Docker** for local deployment and automation. These tools are independent—use whichever best fits your workflow.
+
+### Directory Structure
+
+- `terraform/` — Infrastructure as Code for provisioning cloud resources (e.g., servers, databases, networking).
+- `ansible/` — Configuration management and automation scripts for local or remote servers.
+- `docker/` — Dockerfiles and Compose files for containerized local deployment.
+
+---
+
+## Terraform (Cloud Infrastructure)
+
+The `terraform/` directory contains configuration files to provision cloud resources such as VMs, managed databases, and networking.  
+**Note:** Terraform is intended for cloud deployments and is not required for local development.
+
+**Getting Started:**
+
+1. Install [Terraform](https://www.terraform.io/downloads.html).
+2. Create S3 buckets for storing infrastructure and database state files if you plan to use remote state.
+3. Create `terraform.tfvars` files and fill in your secrets and variables.
+4. Initialize and apply:
+  ```sh
+  cd terraform
+  terraform init
+  terraform apply
+  ```
+5. Review outputs for connection details.
+
+**Ignored files:**
+- `.terraform/` — Terraform state and cache directory.
+- `terraform.tfstate` / `terraform.tfstate.backup` — State files tracking resource deployments.
+- `terraform.tfvars` — Contains sensitive variable values (never commit this file).
+
+**Security Note:**  
+Never share or commit your `terraform.tfvars` or state files, as they may contain sensitive information.
+
+---
+
+## Ansible (Local or Remote Automation)
+
+The `ansible/` directory contains playbooks and roles for automating the setup and configuration of servers.  
+**Note:** Ansible is independent of Terraform and can be used for local deployment or to configure remote servers provisioned by any method.
+
+- Customize inventory files (e.g., `hosts`) for your environment.
+- Create secrets and vault files (e.g., `vault.yml`) locally as needed.
+
+**Ignored files:**
+- `vault.yml` — Stores encrypted secrets for Ansible Vault.
+- `*.retry` — Retry files generated after failed runs.
+
+---
+
+## Docker (Local Deployment)
+
+The `docker/` directory provides Dockerfiles and Compose files for building and running the application locally or in production.  
+**Note:** Docker is independent of both Terraform and Ansible, and is recommended for quick local setup.
+
+- Use `docker-compose.yml` for multi-service orchestration.
+- Create your own environment files (e.g., `.env`) with appropriate values.
+
+**Ignored files:**
+- `.env` — Contains environment variables and secrets for Docker Compose.
+
+---
+
+## Deployment Options
+
+You can reproduce the infrastructure and run chessu using any of the following methods:
+
+1. **Cloud Deployment with Terraform**
+  - Provision resources (servers, databases, networking) in your cloud provider.
+  - (Optional) Configure remote state storage (e.g., S3 buckets).
+  - Use the provided Makefile to automate infrastructure tasks (e.g., `make infrastructure`).
+
+2. **Local or Remote Automation with Ansible**
+  - Use Ansible playbooks to configure servers after provisioning (with or without Terraform).
+  - Suitable for automating setup on VMs, bare metal, or cloud instances.
+
+3. **Local Deployment with Docker**
+  - Build and run containers using Docker Compose for development or testing.
+  - No cloud resources required.
+
+Choose the approach that best fits your needs—these tools are not dependent on each other.
+
+
 
 <h1 align="center">
   <img src="./assets/chessu.png" alt="chessu" height="128" />

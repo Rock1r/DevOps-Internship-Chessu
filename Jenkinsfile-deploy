@@ -1,0 +1,103 @@
+pipeline {
+    agent { label 'docker' }
+
+    parameters{
+      string(name: 'IMAGE_TAG', description: 'Tag of the image to promote to prod')
+    }
+
+    environment {
+        IMAGE_TAG = "${params.IMAGE_TAG}"
+    }
+
+    stages {
+        stage('Start Notification') {
+            steps {
+                discordSend(
+                    webhookURL: env.DISCORD_WEBHOOK,
+                    title: env.JOB_NAME,
+                    description: "Deploy STARTED:",
+                    link: env.BUILD_URL,
+                )
+            }
+        }
+        stage('Login to ECR') {
+            steps {
+                withAWS(region: "${env.ECR_REGION}") {
+                    sh """
+                       aws ecr get-login-password --region ${env.ECR_REGION} | \
+                       docker login --username AWS --password-stdin ${env.ECR_URI}
+                     """
+                }
+            }
+        }
+        stage('Pull, Tag, Push') {
+            parallel {
+                stage('Client Image') {
+                    stages {
+                        stage('Pull & Tag & Push Client') {
+                            steps {
+                                script {
+                                    def img = docker.image("${ECR_URI}/chessu/client:${IMAGE_TAG}")
+                                    img.pull()
+                                    img.push("prod")
+                                }
+                            }
+                        }
+                    }
+                }
+
+                stage('Server Image') {
+                    stages {
+                        stage('Pull & Tag & Push Server') {
+                            steps {
+                                script {
+                                    def img = docker.image("${ECR_URI}/chessu/server:${IMAGE_TAG}")
+                                    img.pull()
+                                    img.push("prod")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Trigger ECS Service Update') {
+            steps {
+                withAWS(region: "${ECR_REGION}") {
+                    sh """
+                        aws ecs update-service \
+                            --cluster ${env.CLUSTER_NAME} \
+                            --service ${env.CLIENT_SERVICE_NAME} \
+                            --force-new-deployment
+
+                        aws ecs update-service \
+                            --cluster ${env.CLUSTER_NAME} \
+                            --service ${env.SERVER_SERVICE_NAME} \
+                            --force-new-deployment
+                    """
+                }
+            }
+        }
+    }
+    post {
+        success {
+            discordSend(
+                webhookURL: DISCORD_WEBHOOK,
+                title: JOB_NAME,
+                description: "Deploy SUCCESS: `${IMAGE_TAG}` → `prod`, ECS updated",
+                link: env.BUILD_URL,
+                result: 'SUCCESS'
+            )
+        }
+        failure {
+            discordSend(
+                webhookURL: DISCORD_WEBHOOK,
+                title: JOB_NAME,
+                description: "Deploy FAILED for `${IMAGE_TAG}`",
+                link: env.BUILD_URL,
+                result: 'FAILURE'
+            )
+        }
+    }
+}

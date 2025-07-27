@@ -14,6 +14,7 @@ COPY \
 
 COPY ./server/ ./server/
 COPY server/instrumentation.js ./server/instrumentation.js
+COPY ./db_cert.pem /var/db_cert.pem
 
 RUN apk update && \
     corepack enable && corepack prepare pnpm@latest --activate && \

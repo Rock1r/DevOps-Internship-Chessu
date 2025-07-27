@@ -40,7 +40,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-*.pem
+.pem
 
 .vagrant
 .cache
@@ -49,3 +49,8 @@ secrets.yml
 .vault_pass.txt
 .scannerwork/
 zap-report/
+
+.terraform*
+state.config
+*.tfvars
+*.tfstate

@@ -1,11 +1,7 @@
 
 services:
   chessu_client:
-    build:
-      context: .
-      dockerfile: Dockerfile_client
-      args:
-        - NEXT_PUBLIC_API_URL=http://192.168.0.222
+    image: 122627526984.dkr.ecr.us-east-1.amazonaws.com/chessu/client:latest
     expose:
       - "3000"
     labels:
@@ -20,9 +16,7 @@ services:
       options:
         tag: "{{.Name}}/{{.ID}}"
   chessu_server:
-    build:
-      context: .
-      dockerfile: Dockerfile_server
+    image: 122627526984.dkr.ecr.us-east-1.amazonaws.com/chessu/server:latest
     expose:
       - "3001"
     depends_on:
