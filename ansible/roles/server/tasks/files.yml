@@ -1,0 +1,17 @@
+- name: Create instrumentation.js file
+  ansible.builtin.template:
+    src: instrumentation.js.j2
+    dest: /home/{{ username }}/chessu/server/instrumentation.js
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: '0644'
+  become: true
+
+- name: Create .env file
+  ansible.builtin.template:
+    src: .env.j2
+    dest: /home/{{username}}/chessu/server/.env
+    owner: "{{ username }}"
+    group: "{{ username }}"
+    mode: '0644'
+  become: true

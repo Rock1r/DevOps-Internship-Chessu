@@ -1,0 +1,16 @@
+- name: Allow external connections to PostgreSQL
+  community.postgresql.postgresql_pg_hba:
+    dest: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+    contype: host
+    users: all
+    databases: all
+    address: "{{ subnet_address }}"
+    method: md5
+
+- name: Ensure PostgreSQL is listening on all interfaces
+  community.postgresql.postgresql_alter_system:
+    param: listen_addresses
+    value: '*'
+    port: 5432
+  become_user: postgres
+  notify: Restart PostgreSQL

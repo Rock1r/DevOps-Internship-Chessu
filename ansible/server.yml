@@ -1,0 +1,10 @@
+- hosts: server
+  become: yes
+  vars_files:
+    - ./host_vars/server.yml
+    - ./group_vars/db.yml
+    - ./group_vars/user.yml
+    - ./group_vars/otel.yml
+  roles:
+    - common
+    - server

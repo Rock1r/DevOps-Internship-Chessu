@@ -1,0 +1,15 @@
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Install PostgreSQL
+  ansible.builtin.apt:
+    name: "postgresql-{{ postgresql_version }}"
+    state: present
+
+- name: Manage prerequisite packages
+  become: true
+  ansible.builtin.apt:
+    name: ['acl', 'apt-transport-https', 'locales', 'python3-psycopg2']
+    state: present
+    update_cache: true

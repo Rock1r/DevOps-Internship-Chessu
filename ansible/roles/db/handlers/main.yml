@@ -1,0 +1,11 @@
+- name: Restart PostgreSQL
+  ansible.builtin.systemd:
+    name: postgresql
+    state: restarted
+    enabled: yes
+    
+- name: Restart otel collector
+  ansible.builtin.systemd:
+    name: splunk-otel-collector
+    state: restarted
+  become: true

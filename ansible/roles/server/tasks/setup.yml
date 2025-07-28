@@ -1,0 +1,21 @@
+- name: Build server
+  command: pnpm build:server
+  args:
+    chdir: /home/{{ username }}/chessu/
+  become: true
+
+- name: Start server with PM2
+  command: pm2 start --name server dist/server.js --node-args="--require ./instrumentation.js" --log-type json
+  args:
+    chdir: /home/{{ username }}/chessu/server
+  become: true
+
+- name: Save PM2 process list
+  command: pm2 save
+  become: true
+
+- name: Run pm2 startup
+  command: pm2 startup
+  args:
+    creates: /etc/systemd/system/pm2-root.service
+  become: true

@@ -1,0 +1,7 @@
+cors_origin: "{{ backend.CORS_ORIGIN }}"
+port: "{{ backend.PORT }}"
+session_secret: "{{ backend.SESSION_SECRET }}"
+splunk_hec_token: "{{ backend.SPLUNK_HEC_TOKEN }}"
+splunk_server_metrics_index: "{{ backend.SPLUNK_SERVER_METRICS_INDEX }}"
+splunk_server_traces_index: "{{ backend.SPLUNK_SERVER_TRACES_INDEX }}"
+splunk_server_logs_index: "{{ backend.SPLUNK_SERVER_LOGS_INDEX }}"

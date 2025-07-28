@@ -1,0 +1,1 @@
+subnet_address: "{{ shared.SUBNET_ADDRESS }}"

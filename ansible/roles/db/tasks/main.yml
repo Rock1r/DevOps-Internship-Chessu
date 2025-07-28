@@ -1,0 +1,15 @@
+- import_tasks: install.yml
+- import_tasks: configure.yml
+- import_tasks: setup.yml
+- import_tasks: otel.yml
+
+- name: Set password for postgres superuser
+  community.postgresql.postgresql_user:
+    name: postgres
+    password: "{{ db_superuser_password }}"
+    encrypted: true
+    login_user: postgres
+    login_password: "{{ db_superuser_password }}"
+    role_attr_flags: SUPERUSER
+  become: true
+  become_user: postgres

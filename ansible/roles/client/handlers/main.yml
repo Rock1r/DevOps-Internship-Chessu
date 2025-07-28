@@ -1,0 +1,5 @@
+- name: Restart otel collector
+  ansible.builtin.systemd:
+    name: splunk-otel-collector
+    state: restarted
+  become: true
