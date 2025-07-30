@@ -12,7 +12,8 @@ resource "aws_ecr_lifecycle_policy" "client" {
         "countType": "imageCountMoreThan",
         "tagPatternList": [
           "main*",
-          "dev*"
+          "dev*",
+          "prod*"
         ],
         "tagStatus": "tagged"
       }
@@ -49,7 +50,8 @@ resource "aws_ecr_lifecycle_policy" "server" {
         "countType": "imageCountMoreThan",
         "tagPatternList": [
           "main*",
-          "dev*"
+          "dev*",
+          "prod*"
         ],
         "tagStatus": "tagged"
       }

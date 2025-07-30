@@ -3,7 +3,7 @@ module "ec2_instance" {
 
   name                        = "jenkins-master"
   ami                         = "ami-020cba7c55df1f615"
-  instance_type               = "t2.small"
+  instance_type               = "t2.micro"
   subnet_id                   = var.public_subnets[0]
   create_security_group       = false
   vpc_security_group_ids      = var.jenkins_security_group_ids

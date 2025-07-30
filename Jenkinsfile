@@ -1,13 +1,12 @@
 pipeline {
     agent none
 
-    tools {
-        nodejs 'node'
-    }
+
 
     stages {
         stage('Start Notification') {
             agent { label 'node.js' }
+            tools { nodejs 'node' }
             steps {
                 discordSend(
                     webhookURL: env.DISCORD_WEBHOOK,
@@ -22,6 +21,7 @@ pipeline {
             parallel {
                 stage('Frontend Install') {
                     agent { label 'node.js' }
+                    tools { nodejs 'node' }                    
                     steps {
                         dir('client') {
                             sh 'pnpm install --frozen-lockfile'
@@ -30,6 +30,7 @@ pipeline {
                 }
                 stage('Backend Install') {
                     agent { label 'node.js' }
+                    tools { nodejs 'node' }
                     steps {
                         dir('server') {
                             sh 'pnpm install --frozen-lockfile'
@@ -41,6 +42,7 @@ pipeline {
 
         stage('Lint') {
             agent { label 'node.js' }
+            tools { nodejs 'node' }
             steps {
                 dir('chessu') {
                     sh 'pnpm lint'
@@ -52,6 +54,7 @@ pipeline {
             parallel {
                 stage('Frontend Test') {
                     agent { label 'node.js' }
+                    tools { nodejs 'node' }
                     steps {
                         dir('client') {
                             sh 'pnpm test'
@@ -60,6 +63,7 @@ pipeline {
                 }
                 stage('Backend Test') {
                     agent { label 'node.js' }
+                    tools { nodejs 'node' }
                     steps {
                         dir('server') {
                             sh 'pnpm test'
@@ -68,7 +72,22 @@ pipeline {
                 }
             }
         }
-
+        
+        stage('SonarQube Analysis') {
+            agent any
+            steps{
+                script{
+                    def scannerHome = tool 'SonarQube Cloud';
+                    withSonarQubeEnv() {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+                timeout(time: 1, unit: 'HOURS') {
+                waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+          
         stage('Snyk Test') {
             agent any
             steps {
