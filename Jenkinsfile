@@ -68,7 +68,18 @@ pipeline {
                 }
             }
         }
-
+        
+        stage('SonarQube Analysis') {
+            steps{
+                script{
+                    def scannerHome = tool 'SonarQube Cloud';
+                    withSonarQubeEnv() {
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
+        
         stage('Snyk Test') {
             agent any
             steps {
