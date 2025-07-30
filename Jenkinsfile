@@ -82,9 +82,12 @@ pipeline {
                         sh "${scannerHome}/bin/sonar-scanner"
                     }
                 }
+                timeout(time: 1, unit: 'HOURS') {
+                waitForQualityGate abortPipeline: true
+                }
             }
         }
-        
+          
         stage('Snyk Test') {
             agent any
             steps {
