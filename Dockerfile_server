@@ -15,6 +15,8 @@ COPY \
 COPY ./server/ ./server/
 COPY server/instrumentation.js ./server/instrumentation.js
 COPY ./db_cert.pem /var/db_cert.pem
+COPY ./aws/server/otel-config.yaml /etc/otel/config.yaml
+COPY ./aws/server/entrypoint.sh /entrypoint.sh
 
 RUN apk update && \
     corepack enable && corepack prepare pnpm@latest --activate && \
@@ -26,6 +28,13 @@ RUN apk update && \
     @opentelemetry/exporter-metrics-otlp-proto \
     @opentelemetry/instrumentation \
     @opentelemetry/sdk-metrics && \
-    pnpm --filter server build
-ENV NODE_OPTIONS="--require /opt/chessu/server/instrumentation.js"
-CMD ["pnpm", "--filter", "server", "start"]
+    pnpm --filter server build && \
+    apk add --no-cache curl tar && \
+    curl -L https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.131.0/otelcol_0.131.0_linux_amd64.tar.gz -o /tmp/otelcol.tar.gz && \
+    tar -xzf /tmp/otelcol.tar.gz -C /tmp && \
+    mv /tmp/otelcol /usr/local/bin/otelcol && \
+    chmod +x /usr/local/bin/otelcol && \
+    rm -rf /tmp/otelcol* && \
+    chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
