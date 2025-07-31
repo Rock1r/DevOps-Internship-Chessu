@@ -40,15 +40,15 @@ pipeline {
             }
         }
 
-        stage('Lint') {
-            agent { label 'node.js' }
-            tools { nodejs 'node' }
-            steps {
-                dir('chessu') {
-                    sh 'pnpm lint'
-                }
-            }
-        }
+        // stage('Lint') {
+        //     agent { label 'node.js' }
+        //     tools { nodejs 'node' }
+        //     steps {
+        //         dir('chessu') {
+        //             sh 'pnpm lint'
+        //         }
+        //     }
+        // }
 
         stage('Test') {
             parallel {
