@@ -10,8 +10,7 @@ app:
 
 destroy:
 	cd network-security && terraform destroy -target module.endpoints -auto-approve
-	cd jenkins && terraform destroy -target module.jenkins_instance -auto-approve
-	cd app && terraform destroy -auto-approve
+	cd app && terraform destroy -target module.ecs -auto-approve
 
 jenkins:
 	cd app && terraform apply -target module.alb -auto-approve

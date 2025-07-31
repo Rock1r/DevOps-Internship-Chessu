@@ -1,0 +1,40 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+  hostmetrics:
+    collection_interval: 10s
+    scrapers:
+      cpu:
+      disk:
+      filesystem:
+      memory:
+      network:
+      load:
+      paging:
+      processes:
+processors:
+  batch:
+    send_batch_size: 1000
+    timeout: 10s
+exporters:
+  debug:
+    verbosity: detailed
+  otlphttp/splunk:
+    endpoint: https://ingest.eu1.signalfx.com/v2/otlp
+    headers:
+      "X-SF-TOKEN": "${SPLUNK_ACCESS_TOKEN}"
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [debug, otlphttp/splunk]
+    metrics:
+      receivers: [otlp, hostmetrics]
+      exporters: [debug, otlphttp/splunk]
+    logs:
+      receivers: [otlp]
+      exporters: [debug, otlphttp/splunk]

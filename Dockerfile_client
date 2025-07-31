@@ -44,8 +44,14 @@ COPY --from=builder /chessu/client/public ./client/public
 
 COPY --from=otel-deps /otel/node_modules ./client/node_modules
 COPY --from=otel-deps /otel/pnpm-lock.yaml ./client/
+COPY ./aws/client/otel-config.yaml /etc/otel/config.yaml
+COPY ./aws/client/entrypoint.sh /entrypoint.sh
+RUN apk add --no-cache curl tar && \
+    curl -L https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.131.0/otelcol_0.131.0_linux_amd64.tar.gz -o /tmp/otelcol.tar.gz && \
+    tar -xzf /tmp/otelcol.tar.gz -C /tmp && \
+    mv /tmp/otelcol /usr/local/bin/otelcol && \
+    chmod +x /usr/local/bin/otelcol && \
+    rm -rf /tmp/otelcol* && \
+    chmod +x /entrypoint.sh
 
-ENV NODE_OPTIONS="--require /chessu/client/instrumentation.js"
-
-EXPOSE 3000
-CMD ["node", "client/server.js"]
+CMD ["/entrypoint.sh"]

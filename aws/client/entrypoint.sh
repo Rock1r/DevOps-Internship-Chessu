@@ -1,6 +1,7 @@
 #!/bin/sh
 
+export NODE_OPTIONS="--require /chessu/client/instrumentation.js"
+
 otelcol --config=/etc/otel/config.yaml &
 
-NODE_OPTIONS="--require /opt/chessu/server/instrumentation.js"
-pnpm start --filter server
+exec node client/server.js
