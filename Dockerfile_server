@@ -30,7 +30,7 @@ RUN apk update && \
     @opentelemetry/sdk-metrics && \
     pnpm --filter server build && \
     apk add --no-cache curl tar && \
-    curl -L https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.131.0/otelcol_0.131.0_linux_amd64.tar.gz -o /tmp/otelcol.tar.gz && \
+    curl -L https://github.com/signalfx/splunk-otel-collector/releases/download/v0.130.0/splunk-otel-collector_0.130.0_amd64.tar.gz -o /tmp/otelcol.tar.gz && \
     tar -xzf /tmp/otelcol.tar.gz -C /tmp && \
     mv /tmp/otelcol /usr/local/bin/otelcol && \
     chmod +x /usr/local/bin/otelcol && \

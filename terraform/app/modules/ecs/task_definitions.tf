@@ -26,6 +26,10 @@ resource "aws_ecs_task_definition" "client" {
         {
           name  = "HOSTNAME"
           value = "0.0.0.0"
+        },
+        {
+          name = "SPLUNK_ACCESS_TOKEN"
+          valueFrom = "arn:aws:ssm:us-east-1:122627526984:parameter/splunk/access_token"
         }
       ]
       portMappings = [
@@ -105,6 +109,10 @@ resource "aws_ecs_task_definition" "server" {
         {
           name      = "SESSION_SECRET"
           valueFrom = "arn:aws:ssm:us-east-1:122627526984:parameter/server/session_secret"
+        },
+        {
+          name = "SPLUNK_ACCESS_TOKEN"
+          valueFrom = "arn:aws:ssm:us-east-1:122627526984:parameter/splunk/access_token"
         }
       ]
     }
