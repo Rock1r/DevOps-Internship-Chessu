@@ -25,7 +25,11 @@ resource "aws_ecs_task_definition" "client" {
       environment = [
         {
           name  = "HOSTNAME"
-          value = "0.0.0.0"
+          value = "chessu-client"
+        },
+        {
+          name = "OTEL_SERVICE_NAME"
+          value = "chessu-client"
         }
       ]
       secrets = [
@@ -85,6 +89,14 @@ resource "aws_ecs_task_definition" "server" {
         {
           name  = "NODE_EXTRA_CA_CERTS"
           value = "/var/db_cert.pem"
+        },
+        {
+          name  = "HOSTNAME"
+          value = "chessu-server"
+        },
+        {
+          name = "OTEL_SERVICE_NAME"
+          value = "chessu-server"
         }
       ]
       secrets = [
