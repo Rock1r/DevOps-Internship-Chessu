@@ -50,5 +50,5 @@ service:
 
     metrics:
       receivers: [otlp, hostmetrics]
-      processors: [batch]
+      processors: [resourcedetection, batch]
       exporters: [signalfx]

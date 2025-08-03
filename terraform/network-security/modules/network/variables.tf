@@ -31,7 +31,7 @@ variable "public_subnets" {
 variable "enable_nat_gateway" {
   description = "Whether to enable NAT gateway"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "enable_vpn_gateway" {
