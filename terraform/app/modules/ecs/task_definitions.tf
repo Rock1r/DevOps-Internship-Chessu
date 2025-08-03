@@ -25,7 +25,7 @@ resource "aws_ecs_task_definition" "client" {
       environment = [
         {
           name  = "HOSTNAME"
-          value = "chessu-client"
+          value = "0.0.0.0"
         },
         {
           name = "OTEL_SERVICE_NAME"
