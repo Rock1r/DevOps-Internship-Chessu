@@ -36,6 +36,10 @@ resource "aws_ecs_task_definition" "client" {
         {
           name = "SPLUNK_ACCESS_TOKEN"
           valueFrom = "arn:aws:ssm:us-east-1:122627526984:parameter/splunk/access_token"
+        },
+        {
+          name      = "SPLUNK_HEC_URL"
+          valueFrom = "arn:aws:ssm:us-east-1:122627526984:parameter/splunk/hec_token"
         }
       ]
       portMappings = [
@@ -127,6 +131,10 @@ resource "aws_ecs_task_definition" "server" {
         {
           name = "SPLUNK_ACCESS_TOKEN"
           valueFrom = "arn:aws:ssm:us-east-1:122627526984:parameter/splunk/access_token"
+        },
+        {
+          name      = "SPLUNK_HEC_URL"
+          valueFrom = "arn:aws:ssm:us-east-1:122627526984:parameter/splunk/hec_token"
         }
       ]
     }

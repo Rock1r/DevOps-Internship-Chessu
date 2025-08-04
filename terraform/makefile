@@ -9,7 +9,7 @@ app:
 	cd app && terraform apply -auto-approve
 
 destroy:
-	cd network-security && terraform destroy -target module.endpoints -auto-approve
+	cd network-security && terraform destroy -target module.endpoints -auto-approve && terraform destroy -target  module.network.module.vpc.aws_eip.nat -auto-approve && terraform destroy -target module.network.module.vpc.aws_nat_gateway.this -auto-approve
 	cd app && terraform destroy -target module.ecs -auto-approve
 
 jenkins:

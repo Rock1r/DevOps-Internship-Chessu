@@ -16,6 +16,13 @@ receivers:
       load:
       paging:
       processes:
+  filelog:
+    include: [ /tmp/app.log ]
+    start_at: beginning
+    operators:
+      - type: regex_parser
+        regex: '^(?P<message>.*)$'
+        parse_to: body
 
 processors:
   batch:
@@ -42,9 +49,22 @@ exporters:
     ingest_url: https://ingest.eu1.signalfx.com
     sync_host_metadata: true
     correlation:
-    
+
+  splunk_hec:
+    token: "${SPLUNK_HEC_TOKEN}"
+    endpoint: "https://prd-p-ahb3m.splunkcloud.com:8088"
+    source: "client"
+    sourcetype: "_json"
+    tls:
+      insecure_skip_verify: true
+      
 service:
   pipelines:
+    logs:
+      receivers: [filelog]
+      processors: [resourcedetection, batch]
+      exporters: [splunk_hec]
+
     traces:
       receivers: [otlp]
       processors: [batch]
