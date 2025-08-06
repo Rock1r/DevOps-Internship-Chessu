@@ -5,7 +5,7 @@ module "lambda_function" {
   description   = "Send alb logs from s3 to splunk"
   handler       = "lambda.lambda_handler"
   runtime       = "python3.12"
-  create_role = false
+  create_role   = false
   lambda_role   = module.lambda_role.iam_role_arn
   publish       = true
   source_path   = "./lambda.py"
