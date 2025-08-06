@@ -22,3 +22,14 @@ variable "certificate_arn" {
   description = "The ARN of the ACM certificate for the ALB"
   type        = string
 }
+
+variable "access_logs_bucket" {
+  description = "The S3 bucket for ALB access logs"
+  type        = string
+
+}
+
+variable "connection_logs_bucket" {
+  description = "The S3 bucket for ALB connection logs"
+  type        = string
+}
