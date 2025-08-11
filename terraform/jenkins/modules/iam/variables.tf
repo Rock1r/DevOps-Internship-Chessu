@@ -5,7 +5,3 @@ variable "client_repo" {
 variable "server_repo" {
   type = string
 }
-
-variable "jenkins_bucket_name" {
-  type = string
-}

@@ -2,11 +2,13 @@
 module "alb" {
   source = "./modules/alb"
 
-  vpc_id             = data.terraform_remote_state.network-security.outputs.vpc_id
-  public_subnets     = data.terraform_remote_state.network-security.outputs.public_subnets
-  security_group_ids = [data.terraform_remote_state.network-security.outputs.alb_security_group_id]
-  hosted_zone_id     = data.terraform_remote_state.route53.outputs.hosted_zone_id
-  certificate_arn    = data.terraform_remote_state.acm.outputs.certificate_arn
+  vpc_id                 = data.terraform_remote_state.network-security.outputs.vpc_id
+  public_subnets         = data.terraform_remote_state.network-security.outputs.public_subnets
+  security_group_ids     = [data.terraform_remote_state.network-security.outputs.alb_security_group_id]
+  hosted_zone_id         = data.terraform_remote_state.route53.outputs.hosted_zone_id
+  certificate_arn        = data.terraform_remote_state.acm.outputs.certificate_arn
+  access_logs_bucket     = var.access_logs_bucket
+  connection_logs_bucket = var.connection_logs_bucket
 }
 
 module "ecs" {

@@ -3,10 +3,9 @@ module "jenkins_data" {
 }
 
 module "iam" {
-  source              = "./modules/iam"
-  client_repo         = data.terraform_remote_state.ecr.outputs.client_repository_arn
-  server_repo         = data.terraform_remote_state.ecr.outputs.server_repository_arn
-  jenkins_bucket_name = var.jenkins_bucket_name
+  source      = "./modules/iam"
+  client_repo = data.terraform_remote_state.ecr.outputs.client_repository_arn
+  server_repo = data.terraform_remote_state.ecr.outputs.server_repository_arn
 }
 
 module "jenkins_instance" {

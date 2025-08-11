@@ -6,6 +6,16 @@ module "alb" {
   enable_deletion_protection = false
   security_groups            = var.security_group_ids
   create_security_group      = false
+  access_logs = {
+    bucket  = var.access_logs_bucket
+    prefix  = "alb-access-logs"
+    enabled = true
+  }
+  connection_logs = {
+    bucket  = var.connection_logs_bucket
+    prefix  = "alb-connection-logs"
+    enabled = true
+  }
   listeners = {
     https-reverse-proxy = {
       port            = 443

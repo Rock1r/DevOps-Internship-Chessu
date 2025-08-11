@@ -57,3 +57,13 @@ variable "ecr_bucket_region" {
   description = "The AWS region for remote state storage"
   type        = string
 }
+
+variable "access_logs_bucket" {
+  description = "The S3 bucket for ALB access logs"
+  type        = string
+}
+
+variable "connection_logs_bucket" {
+  description = "The S3 bucket for ALB connection logs"
+  type        = string
+} 

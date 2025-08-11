@@ -42,7 +42,3 @@ variable "ecr_bucket_region" {
   description = "The AWS region for remote state storage"
   type        = string
 }
-
-variable "jenkins_bucket_name" {
-  type = string
-}
