@@ -8,24 +8,30 @@ resource "aws_ecs_task_definition" "client" {
   task_role_arn            = aws_iam_role.ecs_task_role.arn
   container_definitions = jsonencode([
     {
-      name      = "client"
-      image     = var.client_image
-      essential = true
-      cpu       = 256
-      memory    = 512
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.chessu_client_logs.name
-          "awslogs-region"        = var.region
-          "awslogs-stream-prefix" = "ecs"
-        }
-      }
+      name                      = "client"
+      image                     = var.client_image
+      essential                 = true
+      cpu                       = 256
+      memory                    = 512
       enable_cloudwatch_logging = false
       environment = [
         {
           name  = "HOSTNAME"
           value = "0.0.0.0"
+        },
+        {
+          name  = "OTEL_SERVICE_NAME"
+          value = "chessu-client"
+        }
+      ]
+      secrets = [
+        {
+          name      = "SPLUNK_ACCESS_TOKEN"
+          valueFrom = "arn:aws:ssm:us-east-1:122627526984:parameter/splunk/access_token"
+        },
+        {
+          name      = "SPLUNK_HEC_TOKEN"
+          valueFrom = "arn:aws:ssm:us-east-1:122627526984:parameter/splunk/hec_token"
         }
       ]
       portMappings = [
@@ -53,14 +59,6 @@ resource "aws_ecs_task_definition" "server" {
       essential = true
       cpu       = 256
       memory    = 512
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.chessu_server_logs.name
-          "awslogs-region"        = var.region
-          "awslogs-stream-prefix" = "ecs"
-        }
-      }
       portMappings = [
         {
           containerPort = 3001
@@ -79,6 +77,14 @@ resource "aws_ecs_task_definition" "server" {
         {
           name  = "NODE_EXTRA_CA_CERTS"
           value = "/var/db_cert.pem"
+        },
+        {
+          name  = "HOSTNAME"
+          value = "chessu-server"
+        },
+        {
+          name  = "OTEL_SERVICE_NAME"
+          value = "chessu-server"
         }
       ]
       secrets = [
@@ -105,28 +111,16 @@ resource "aws_ecs_task_definition" "server" {
         {
           name      = "SESSION_SECRET"
           valueFrom = "arn:aws:ssm:us-east-1:122627526984:parameter/server/session_secret"
+        },
+        {
+          name      = "SPLUNK_ACCESS_TOKEN"
+          valueFrom = "arn:aws:ssm:us-east-1:122627526984:parameter/splunk/access_token"
+        },
+        {
+          name      = "SPLUNK_HEC_TOKEN"
+          valueFrom = "arn:aws:ssm:us-east-1:122627526984:parameter/splunk/hec_token"
         }
       ]
     }
   ])
-}
-
-resource "aws_cloudwatch_log_group" "chessu_server_logs" {
-  name              = "chessu-server-logs"
-  retention_in_days = 7
-  region            = var.region
-  tags = {
-    Environment = "development"
-    Application = "server"
-  }
-}
-
-resource "aws_cloudwatch_log_group" "chessu_client_logs" {
-  name              = "chessu-client-logs"
-  retention_in_days = 7
-  region            = var.region
-  tags = {
-    Environment = "development"
-    Application = "client"
-  }
 }

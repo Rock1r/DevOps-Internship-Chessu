@@ -9,7 +9,3 @@ output "chessu-tfstate_bucket_name" {
 output "chessu-db-tfstate_bucket_name" {
   value = module.chessu-db-bucket.s3_bucket_id
 }
-
-output "jenkins_bucket_name" {
-  value = module.jenkins-bucket.s3_bucket_id
-}

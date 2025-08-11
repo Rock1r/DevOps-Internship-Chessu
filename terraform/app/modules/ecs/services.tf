@@ -6,7 +6,7 @@ resource "aws_ecs_service" "client" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets          = var.public_subnets
+    subnets          = var.private_subnets
     security_groups  = var.client_security_group_ids
     assign_public_ip = true
   }
